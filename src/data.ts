@@ -1,6 +1,8 @@
 import flattenHTMLCollectionTree from "./helpers/flatenHTMLCollectionTree";
 import getInkscapeLabel from "./helpers/getInkscapeLabel";
 
+const roomNumberRegex = /^([0-9]{3})(\.[0-9])?$/; // https://regexr.com/7hr5f
+
 export type Building = {
   name: string | null;
   buildingGroupElement: SVGGElement;
@@ -9,10 +11,12 @@ export type Building = {
 };
 
 export type Room = {
-  number: string | null;
-  textElement: SVGTSpanElement | null;
+  number: Text | null;
+  extraTexts: Text[] | null;
   roomFloorElement: SVGRectElement | SVGPathElement | null;
   building: Building;
+  bgColor: string | null;
+  textColor: string | null;
 };
 
 export type EntrySign = {
@@ -20,23 +24,28 @@ export type EntrySign = {
   rectElement: SVGRect;
 };
 
-const data: {
+type Text = {
+  element: SVGTextElement;
+  content: string;
+};
+
+export type Data = {
   buildings: Building[];
   rooms: Room[];
   entrySigns: EntrySign[];
   document: Document | null;
-} = {
-  buildings: [],
-  rooms: [],
-  entrySigns: [],
-  document: null,
 };
-export default data;
-export let loaded = false;
 
 export async function loadElements(
   svgObjectRef: React.RefObject<HTMLObjectElement>
 ) {
+  const data: Data = {
+    buildings: [],
+    rooms: [],
+    entrySigns: [],
+    document: null,
+  };
+
   const svgObject = svgObjectRef.current;
   if (svgObject === null) throw Error("floor-plan is null");
 
@@ -46,7 +55,6 @@ export async function loadElements(
   data.document = svgObject.contentWindow.document;
   const svg = Array.from(svgObject.contentWindow.document.children).at(0);
   if (svg === undefined) throw Error("svg is undefined");
-  console.log(svg);
 
   // load rooms
   const elements = flattenHTMLCollectionTree(svg.children);
@@ -98,11 +106,37 @@ export async function loadElements(
           (elm) => elm.constructor.name === "SVGGElement"
         ) as SVGGElement[]
       ).map((roomGroup) => {
-        const textElement = roomGroup.querySelector<SVGTextElement>("text");
-        if (textElement === null)
-          console.error("could not find room number text element", roomGroup);
+        const textElements = roomGroup.querySelectorAll<SVGTextElement>("text");
+        if (textElements.length === 0)
+          console.error(
+            "could not find a text element inside room group",
+            roomGroup
+          );
 
-        const number = textElement?.textContent || null;
+        const numberElement = Array.from(textElements).find((element) =>
+          roomNumberRegex.test(element.textContent || "")
+        );
+        if (numberElement === undefined)
+          console.error(
+            "could not find text element that satisfies room number regex",
+            roomGroup
+          );
+
+        const extraTexts: Room["extraTexts"] = Array.from(textElements)
+          .filter(
+            (element) => element.textContent !== numberElement?.textContent
+          )
+          .map((element) => ({
+            element,
+            content: element.textContent || "",
+          }));
+
+        const number: Room["number"] = numberElement
+          ? {
+              element: numberElement,
+              content: numberElement?.textContent || "",
+            }
+          : null;
 
         const roomFloorElement = roomGroup.querySelector<
           SVGRectElement | SVGPathElement
@@ -110,23 +144,25 @@ export async function loadElements(
         if (roomFloorElement === null)
           console.error(`could not find room floor element`, roomGroup);
 
+        const bgColor = roomFloorElement?.style.fill || null;
+        const textColor = number?.element.style.fill || null;
+
         return {
           number,
+          extraTexts,
           building,
           roomFloorElement,
-          textElement,
+          bgColor,
+          textColor,
         };
       });
-
     return building;
   });
 
-  // get all room-floor elements
-
-  loaded = true;
+  data.rooms = data.buildings.map((building) => building.rooms || []).flat();
 
   console.log(data);
   // data.rooms.forEach((room) => (room.roomElement.style.opacity = "0.2"));
   // console.log({ roomNumbers, entrySigns, stairSigns });
-  return;
+  return data;
 }
