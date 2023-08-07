@@ -8,31 +8,39 @@ import { twMerge } from "tailwind-merge";
 
 function App() {
   const overlayElementRef = useRef<HTMLDivElement>(null);
-  const objectElementRef = useRef<HTMLObjectElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<Data | undefined>(undefined);
 
   const setup = async () => {
-    if (
-      objectElementRef.current === null ||
-      objectElementRef.current.contentDocument === null
-    )
-      return;
-
-    loadElements(objectElementRef).then((_data) => setData(_data));
+    if (containerRef.current === null)
+      throw Error("container ref is null while trying to run setup");
+    await mapSetup(containerRef).then((_data) => setData(_data));
   };
 
-  const [loadData, setLoadData] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  const fetched = useRef(false);
   useEffect(() => {
-    if (
-      loadData &&
-      !!objectElementRef.current?.contentDocument?.querySelector("svg")
-    )
+    if (!fetched.current) {
+      fetched.current = true;
+      fetch("/map.svg")
+        .then((res) => res.text())
+        .then((svg) => {
+          if (containerRef.current === null)
+            throw Error("map container ref is null");
+          containerRef.current.innerHTML = svg;
+
+          setLoading(false);
+
+          // add full height and width to new svg element
+          document
+            .querySelector("div > svg")
+            ?.classList.add("w-full", "h-full");
+
       setup();
-    else {
-      setLoadData(false);
-      setTimeout(() => setLoadData(true), 40);
+        });
     }
-  }, [loadData]);
+  }, []);
 
   return (
     <>

@@ -36,9 +36,7 @@ export type Data = {
   document: Document | null;
 };
 
-export async function loadElements(
-  svgObjectRef: React.RefObject<HTMLObjectElement>
-) {
+export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
   const data: Data = {
     buildings: [],
     rooms: [],
@@ -46,14 +44,10 @@ export async function loadElements(
     document: null,
   };
 
-  const svgObject = svgObjectRef.current;
-  if (svgObject === null) throw Error("floor-plan is null");
+  const container = containerRef.current;
+  if (container === null) throw Error("container is null");
 
-  if (svgObject.contentWindow === null)
-    throw Error("htmlObjectElement has no content window");
-
-  data.document = svgObject.contentWindow.document;
-  const svg = Array.from(svgObject.contentWindow.document.children).at(0);
+  const svg = Array.from(container.children).at(0);
   if (svg === undefined) throw Error("svg is undefined");
 
   // load rooms
