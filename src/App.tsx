@@ -3,6 +3,9 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Data, mapSetup } from "./data";
 import SearchBox from "./components/SearchBox";
 import Spinner from "./components/Spinner";
+import zoomInIcon from "@assets/zoomIn.svg";
+import zoomOutIcon from "@assets/zoomOut.svg";
+import fullZoomOutIcon from "@assets/fullZoomOut.svg";
 
 function App() {
   const overlayElementRef = useRef<HTMLDivElement>(null);
@@ -104,10 +107,26 @@ function App() {
                 />
               )}
               <div className="fixed bottom-3 left-3 z-10 flex flex-col gap-2">
-                <ControlButton onClick={() => zoomIn()}>+</ControlButton>
-                <ControlButton onClick={() => zoomOut()}>-</ControlButton>
+                <ControlButton onClick={() => zoomIn()}>
+                  <img
+                    className="invert h-2/3"
+                    src={zoomInIcon}
+                    alt="zoom in"
+                  />
+                </ControlButton>
+                <ControlButton onClick={() => zoomOut()}>
+                  <img
+                    className="invert h-2/3"
+                    src={zoomOutIcon}
+                    alt="zoom out"
+                  />
+                </ControlButton>
                 <ControlButton onClick={() => resetTransform()}>
-                  0
+                  <img
+                    className="invert h-2/3"
+                    src={fullZoomOutIcon}
+                    alt="full zoom out"
+                  />
                 </ControlButton>
               </div>
 
@@ -143,7 +162,7 @@ function ControlButton({
 }) {
   return (
     <button
-      className="rounded-full cursor-pointer aspect-square bg-zinc-800 h-10 text-white"
+      className="rounded-full cursor-pointer aspect-square bg-zinc-800 h-10 text-white flex justify-center items-center"
       onClick={onClick}
     >
       {children}
