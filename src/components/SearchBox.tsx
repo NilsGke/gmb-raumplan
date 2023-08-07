@@ -1,4 +1,11 @@
-import { CSSProperties, ReactNode, RefObject, useState } from "react";
+import {
+  CSSProperties,
+  ReactNode,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { twMerge } from "tailwind-merge";
 import useKeyboard from "../hooks/useKeybaord";
 import SearchIcon from "@assets/search.svg";
@@ -9,10 +16,16 @@ export default function SearchBox({
   data,
   zoomToElement,
   overlayRef,
+  zoomIn,
+  zoomOut,
+  move,
 }: {
   data: Data;
   zoomToElement: (element: HTMLElement) => void;
   overlayRef: RefObject<HTMLDivElement>;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  move: (direction: "left" | "up" | "right" | "down") => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [searchString, setSearchString] = useState("");
@@ -26,12 +39,45 @@ export default function SearchBox({
         }
         break;
       case "Escape":
-        setExpanded(false);
+        if (searchString !== "") setSearchString("");
+        else setExpanded(false);
+        break;
+
+      case "+":
+        zoomIn();
+        break;
+      case "-":
+        zoomOut();
+        break;
+      case "ArrowRight":
+        move("right");
+        break;
+      case "ArrowLeft":
+        move("left");
+        break;
+      case "ArrowUp":
+        move("up");
+        break;
+      case "ArrowDown":
+        move("down");
         break;
       default:
         break;
     }
   });
+
+  // focus input on expand
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (expanded && inputRef.current !== null) inputRef.current.select();
+  }, [expanded]);
+
+  console.log(
+    data.rooms.map((room) => ({
+      room,
+      number: parseFloat(room.number?.content || "0"),
+    }))
+  );
 
   const entries = [
     ...data.rooms
@@ -39,10 +85,18 @@ export default function SearchBox({
         room,
         number: parseFloat(room.number?.content || "0"),
       }))
-      .sort((a, b) => a.number - b.number)
+      .sort((a, b) => (a.number === undefined ? 2 : a.number - b.number))
       .map((room) => room.room)
-      .filter((room) =>
-        room.number?.content.toLowerCase().includes(searchString.toLowerCase())
+      .filter(
+        (room) =>
+          room.number?.content
+            .toLowerCase()
+            .includes(searchString.toLowerCase()) ||
+          room.extraTexts?.some((textElement) =>
+            textElement.content
+              .toLowerCase()
+              .includes(searchString.toLowerCase())
+          )
       ),
   ];
 
@@ -51,15 +105,30 @@ export default function SearchBox({
     setExpanded(false);
     const div = document.createElement("div");
     const border = 4;
-    div.className = `absolute rounded border border-[${border}px] transition-all`;
-    const rect = element.getBoundingClientRect();
-    console.log(element.style.fill);
+    div.className = `absolute rounded border border-[${border}px] transition-all pointer-events-none`;
+
+    const transformString =
+      document.querySelector<HTMLDivElement>(".react-transform-component")
+        ?.style.transform || "scale(1)";
+
+    const scaleMatch = /scale\((\d+(\.\d+)?)\)/.exec(transformString);
+    const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 0;
+
+    console.log({ transformString, scaleMatch, scale });
+
+    const overlayPos = overlayRef.current.getBoundingClientRect();
+    const elementPos = element.getBoundingClientRect();
+
+    console.log({ overlayPos, elementPos });
+
     div.style.borderColor =
       element.style.fill === "rgb(238, 29, 35)" ? "#006ea1" : "red";
-    div.style.left = rect.x - border + "px";
-    div.style.top = rect.y - border + "px";
-    div.style.width = rect.width + border * 2 + "px";
-    div.style.height = rect.height + border * 2 + "px";
+    div.style.left =
+      (Math.abs(overlayPos.left) + elementPos.left) / scale - border + "px";
+    div.style.top =
+      (Math.abs(overlayPos.top) + elementPos.top) / scale - border + "px";
+    div.style.width = elementPos.width / scale + border * 2 + "px";
+    div.style.height = elementPos.height / scale + border * 2 + "px";
     overlayRef.current.appendChild(div);
     requestAnimationFrame(() => {
       zoomToElement(div);
@@ -81,7 +150,7 @@ export default function SearchBox({
 
     setTimeout(() => {
       div.remove();
-    }, 3000);
+    }, 4000);
   };
 
   return (
@@ -95,15 +164,23 @@ export default function SearchBox({
     >
       <header className="w-full h-10 flex justify-between relative ">
         <input
-          type="text"
+          type="search"
           className={twMerge(
             "rounded bg-zinc-700 m-4 h-10  text-white transition-all duration-300",
             expanded
               ? "w-full m-3 mr-6 p-2 opacity-100"
               : "w-0 m-0 p-0 opacity-0"
           )}
+          ref={inputRef}
           value={searchString}
           onChange={(e) => setSearchString(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key !== "Enter") return;
+            const element =
+              entries.at(0)?.roomFloorElement ||
+              entries.at(0)?.building.outlineElement;
+            if (element) highlightElement(element);
+          }}
           placeholder="Suchen..."
         />
         <button
@@ -134,24 +211,37 @@ export default function SearchBox({
 
       <section className="mt-4 p-2 w-full h-[calc(100%-64px-10px)] overflow-y-scroll scroll-px-2 scrollbar ">
         <div>
-          {entries.map((room) => (
-            <ResultElement
-              onClick={() => {
-                console.log(room.roomFloorElement);
-                if (room.roomFloorElement)
-                  highlightElement(room.roomFloorElement);
-                zoomToElement(room.roomFloorElement as unknown as HTMLElement);
-              }}
-              style={{
-                backgroundColor: room.bgColor || undefined,
-                color: room.textColor || undefined,
-              }}
-            >
-              {room.number?.content ||
+          {entries.map((room) => {
+            const extranames = room.extraTexts
+              ?.map((text) => text.content)
+              .join(", ");
+
+            const name = extranames
+              ? extranames +
+                (room.number?.content ? ` (${room.number?.content})` : "")
+              : room.number?.content ||
                 room.extraTexts?.at(0)?.content ||
-                "unnamed Room"}
-            </ResultElement>
-          ))}
+                "unnamed Room";
+
+            return (
+              <ResultElement
+                onClick={() => {
+                  console.log(room.roomFloorElement);
+                  if (room.roomFloorElement)
+                    highlightElement(room.roomFloorElement);
+                  zoomToElement(
+                    room.roomFloorElement as unknown as HTMLElement
+                  );
+                }}
+                style={{
+                  backgroundColor: room.bgColor || undefined,
+                  color: room.textColor || undefined,
+                }}
+              >
+                {name}
+              </ResultElement>
+            );
+          })}
         </div>
       </section>
     </div>

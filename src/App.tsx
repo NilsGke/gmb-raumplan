@@ -1,10 +1,8 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
-import Map from "@assets/map.svg";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { Data, loadElements } from "./data";
+import { Data, mapSetup } from "./data";
 import SearchBox from "./components/SearchBox";
 import Spinner from "./components/Spinner";
-import { twMerge } from "tailwind-merge";
 
 function App() {
   const overlayElementRef = useRef<HTMLDivElement>(null);
@@ -37,7 +35,7 @@ function App() {
             .querySelector("div > svg")
             ?.classList.add("w-full", "h-full");
 
-      setup();
+          setup();
         });
     }
   }, []);
@@ -45,22 +43,62 @@ function App() {
   return (
     <>
       <div className="absolute w-screen h-screen">
-        <Spinner
-          className={twMerge(
-            "absolute h-20 w-20 bottom-[calc(50%-5rem/2)] left-[calc(50%-5rem/2)] transition-all duration-500",
-            data !== undefined ? "opacity-0" : "opacity-100"
-          )}
-        />
+        {loading && (
+          <Spinner className="absolute h-20 w-20 bottom-[calc(50%-5rem/2)] left-[calc(50%-5rem/2)] transition-all duration-500" />
+        )}
         <TransformWrapper centerOnInit centerZoomedOut={false} smooth={false}>
-          {({ zoomIn, zoomOut, resetTransform, zoomToElement }) => (
+          {({
+            zoomIn,
+            zoomOut,
+            resetTransform,
+            zoomToElement,
+            setTransform,
+            instance,
+          }) => (
             <>
               {data === undefined ? (
                 <Spinner className="fixed h-10 w-10 bottom-5 right-5" />
               ) : (
                 <SearchBox
                   zoomToElement={(element: HTMLElement) =>
-                    zoomToElement(element, 3, 500, "easeInQuad")
+                    zoomToElement(
+                      element,
+                      window.innerWidth < 800 ? 3 : 2,
+                      500,
+                      "easeInQuad"
+                    )
                   }
+                  zoomIn={() => zoomIn()}
+                  zoomOut={() => zoomOut()}
+                  move={(direction) => {
+                    let x = 0,
+                      y = 0;
+                    const d = 80;
+                    switch (direction) {
+                      case "right":
+                        x = -d;
+                        break;
+                      case "left":
+                        x = d;
+                        break;
+                      case "up":
+                        y = d;
+                        break;
+                      case "down":
+                        y = -d;
+                        break;
+                      default:
+                        break;
+                    }
+                    const current = instance.transformState;
+                    setTransform(
+                      current.positionX + x,
+                      current.positionY + y,
+                      current.scale,
+                      100,
+                      "easeOutCubic"
+                    );
+                  }}
                   overlayRef={overlayElementRef}
                   data={data}
                 />
@@ -72,21 +110,21 @@ function App() {
                   0
                 </ControlButton>
               </div>
+
               <TransformComponent
-                wrapperClass="w-full h-full"
-                contentClass="w-full h-full relative"
+                wrapperClass="!w-full !h-full"
+                contentClass="!w-full !h-full relative"
               >
                 <div
-                  className="absolute h-full w-full z-0 cursor-grab"
-                  ref={overlayElementRef}
+                  className="h-full w-full flex justify-center items-center"
+                  ref={containerRef}
                 />
-                <object
-                  data={Map}
-                  type="image/svg+xml"
-                  className="w-full h-full"
-                  ref={objectElementRef}
-                  onChange={setup}
-                ></object>
+                <div className="absolute top-0 left-0 pointer-events-none h-full w-full">
+                  <div
+                    className="h-full w-full relative"
+                    ref={overlayElementRef}
+                  />
+                </div>
               </TransformComponent>
             </>
           )}
@@ -105,7 +143,7 @@ function ControlButton({
 }) {
   return (
     <button
-      className="rounded-full cursor-pointer aspect-square bg-zinc-800 h-10"
+      className="rounded-full cursor-pointer aspect-square bg-zinc-800 h-10 text-white"
       onClick={onClick}
     >
       {children}
