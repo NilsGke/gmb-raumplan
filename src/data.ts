@@ -2,6 +2,7 @@ import flattenHTMLCollectionTree from "./helpers/flatenHTMLCollectionTree";
 import getInkscapeLabel from "./helpers/getInkscapeLabel";
 
 const roomNumberRegex = /^([0-9]{3})(\.[0-9])?$/; // https://regexr.com/7hr5f
+const entryNumberRegex = /E[0-9]+/;
 
 export type Building = {
   name: string | null;
@@ -20,8 +21,19 @@ export type Room = {
 };
 
 export type EntrySign = {
-  textElement: SVGTSpanElement;
-  rectElement: SVGRect;
+  text: Text | null;
+  rectElement: SVGRectElement | null;
+  bgColor: string | null;
+  textColor: string | null;
+};
+export const objectisEntrySign = (obj: object): obj is EntrySign => {
+  const keys = Object.keys(obj);
+  return (
+    keys.includes("text") &&
+    keys.includes("rectElement") &&
+    keys.includes("bgColor") &&
+    keys.includes("textColor")
+  );
 };
 
 type Text = {
@@ -52,6 +64,8 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
 
   // load rooms
   const elements = flattenHTMLCollectionTree(svg.children);
+  console.log(elements);
+
   // remove images
   elements.forEach((elm) =>
     elm.constructor.name === "SVGImageElement" ? elm.remove() : null
@@ -154,6 +168,30 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
   });
 
   data.rooms = data.buildings.map((building) => building.rooms || []).flat();
+
+  // entry signs
+  data.entrySigns = Array.from(svg.querySelector(".entries")?.children || [])
+    .filter((group) => {
+      const text = group.querySelector("text")?.textContent;
+      return typeof text === "string" && entryNumberRegex.test(text);
+    })
+    .map((group) => {
+      const textElement = group.querySelector<SVGTextElement>("text");
+      const rectElement = group.querySelector<SVGRectElement>("rect");
+
+      return {
+        text:
+          textElement !== null
+            ? {
+                content: textElement.textContent || "",
+                element: textElement,
+              }
+            : null,
+        rectElement,
+        bgColor: rectElement?.style.fill || null,
+        textColor: textElement?.style.fill || null,
+      };
+    });
 
   console.log(data);
   // data.rooms.forEach((room) => (room.roomElement.style.opacity = "0.2"));

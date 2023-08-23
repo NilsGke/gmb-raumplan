@@ -10,7 +10,7 @@ import { twMerge } from "tailwind-merge";
 import useKeyboard from "../hooks/useKeybaord";
 import SearchIcon from "@assets/search.svg";
 import CloseIcon from "@assets/close.svg";
-import { Data } from "../data";
+import { Data, objectisEntrySign } from "../data";
 
 export default function SearchBox({
   data,
@@ -72,33 +72,32 @@ export default function SearchBox({
     if (expanded && inputRef.current !== null) inputRef.current.select();
   }, [expanded]);
 
-  console.log(
-    data.rooms.map((room) => ({
+  const searchLower = searchString.toLowerCase();
+
+  const rooms = data.rooms
+    .map((room) => ({
       room,
       number: parseFloat(room.number?.content || "0"),
     }))
-  );
+    .sort((a, b) => (a.number === undefined ? 2 : a.number - b.number))
+    .map((room) => room.room)
+    .filter(
+      (room) =>
+        room.number?.content.toLowerCase().includes(searchLower) ||
+        room.extraTexts?.some((textElement) =>
+          textElement.content.toLowerCase().includes(searchLower)
+        )
+    );
 
-  const entries = [
-    ...data.rooms
-      .map((room) => ({
-        room,
-        number: parseFloat(room.number?.content || "0"),
-      }))
-      .sort((a, b) => (a.number === undefined ? 2 : a.number - b.number))
-      .map((room) => room.room)
-      .filter(
-        (room) =>
-          room.number?.content
-            .toLowerCase()
-            .includes(searchString.toLowerCase()) ||
-          room.extraTexts?.some((textElement) =>
-            textElement.content
-              .toLowerCase()
-              .includes(searchString.toLowerCase())
-          )
-      ),
-  ];
+  const entrySigns = data.entrySigns
+    .filter((entrySign) =>
+      entrySign.text?.content.toLowerCase().includes(searchLower)
+    )
+    .sort((a, b) =>
+      (a.text?.content || "") >= (b.text?.content || "") ? -1 : 1
+    );
+
+  const allResults = [...rooms, ...entrySigns];
 
   const highlightElement = (element: SVGElement) => {
     if (overlayRef.current === null) return;
@@ -114,12 +113,8 @@ export default function SearchBox({
     const scaleMatch = /scale\((\d+(\.\d+)?)\)/.exec(transformString);
     const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 0;
 
-    console.log({ transformString, scaleMatch, scale });
-
     const overlayPos = overlayRef.current.getBoundingClientRect();
     const elementPos = element.getBoundingClientRect();
-
-    console.log({ overlayPos, elementPos });
 
     div.style.borderColor =
       element.style.fill === "rgb(238, 29, 35)" ? "#006ea1" : "red";
@@ -176,10 +171,17 @@ export default function SearchBox({
           onChange={(e) => setSearchString(e.target.value)}
           onKeyDown={(e) => {
             if (e.key !== "Enter") return;
-            const element =
-              entries.at(0)?.roomFloorElement ||
-              entries.at(0)?.building.outlineElement;
-            if (element) highlightElement(element);
+            const resultElement = allResults.at(0);
+            if (resultElement === undefined) return;
+            if (objectisEntrySign(resultElement)) {
+              if (resultElement.rectElement !== null)
+                highlightElement(resultElement.rectElement);
+            } else {
+              const element =
+                resultElement.roomFloorElement ||
+                resultElement.building.outlineElement;
+              if (element) highlightElement(element);
+            }
           }}
           placeholder="Suchen..."
         />
@@ -211,37 +213,66 @@ export default function SearchBox({
 
       <section className="mt-4 p-2 w-full h-[calc(100%-64px-10px)] overflow-y-scroll scroll-px-2 scrollbar ">
         <div>
-          {entries.map((room) => {
-            const extranames = room.extraTexts
-              ?.map((text) => text.content)
-              .join(", ");
+          {rooms.length > 0 && (
+            <ResultCategory name="Räume">
+              {rooms.map((room) => {
+                const extranames = room.extraTexts
+                  ?.map((text) => text.content)
+                  .join(", ");
 
-            const name = extranames
-              ? extranames +
-                (room.number?.content ? ` (${room.number?.content})` : "")
-              : room.number?.content ||
-                room.extraTexts?.at(0)?.content ||
-                "unnamed Room";
+                const name = extranames
+                  ? extranames +
+                    (room.number?.content ? ` (${room.number?.content})` : "")
+                  : room.number?.content ||
+                    room.extraTexts?.at(0)?.content ||
+                    "unnamed Room";
 
-            return (
-              <ResultElement
-                onClick={() => {
-                  console.log(room.roomFloorElement);
-                  if (room.roomFloorElement)
-                    highlightElement(room.roomFloorElement);
-                  zoomToElement(
-                    room.roomFloorElement as unknown as HTMLElement
-                  );
-                }}
-                style={{
-                  backgroundColor: room.bgColor || undefined,
-                  color: room.textColor || undefined,
-                }}
-              >
-                {name}
-              </ResultElement>
-            );
-          })}
+                return (
+                  <ResultElement
+                    onClick={() => {
+                      if (room.roomFloorElement)
+                        highlightElement(room.roomFloorElement);
+                      zoomToElement(
+                        room.roomFloorElement as unknown as HTMLElement
+                      );
+                    }}
+                    style={{
+                      backgroundColor: room.bgColor || undefined,
+                      color: room.textColor || undefined,
+                    }}
+                  >
+                    {name}
+                  </ResultElement>
+                );
+              })}
+            </ResultCategory>
+          )}
+
+          {entrySigns.length > 0 && (
+            <ResultCategory name="Eingänge">
+              {entrySigns.map((entrySign) => (
+                <ResultElement
+                  onClick={() => {
+                    if (entrySign.rectElement)
+                      highlightElement(entrySign.rectElement);
+                    zoomToElement(
+                      entrySign.rectElement as unknown as HTMLElement
+                    );
+                  }}
+                  style={{
+                    backgroundColor: entrySign.bgColor || undefined,
+                    color: entrySign.textColor || undefined,
+                  }}
+                >
+                  {entrySign.text?.content || "unnamed Entry"}
+                </ResultElement>
+              ))}
+            </ResultCategory>
+          )}
+
+          {rooms.length === 0 && entrySigns.length === 0 && (
+            <div className="text-zinc-500">Nichts gefunden :(</div>
+          )}
         </div>
       </section>
     </div>
@@ -267,5 +298,24 @@ function ResultElement({
     >
       {children}
     </button>
+  );
+}
+
+function ResultCategory({
+  children,
+  name,
+}: {
+  children: ReactNode[];
+  name: string;
+}) {
+  return (
+    <div>
+      <details open>
+        <summary className="text-zinc-300 text-sm cursor-pointer">
+          {name}
+        </summary>
+        <div>{...children}</div>
+      </details>
+    </div>
   );
 }
