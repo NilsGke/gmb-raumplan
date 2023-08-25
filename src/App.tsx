@@ -8,7 +8,7 @@ import zoomOutIcon from "@assets/zoomOut.svg";
 import fullZoomOutIcon from "@assets/fullZoomOut.svg";
 import Map from "@assets/map.svg";
 import InfoButton from "./components/InfoButton";
-import DownlaodButton from "./components/DownlaodButton";
+import DownloadButton from "./components/DownloadButton";
 
 function App() {
   console.log(Map);
@@ -54,7 +54,7 @@ function App() {
           <Spinner className="absolute h-20 w-20 bottom-[calc(50%-5rem/2)] left-[calc(50%-5rem/2)] transition-all duration-500" />
         )}
         <InfoButton />
-        <DownlaodButton />
+        <DownloadButton />
         <TransformWrapper centerOnInit centerZoomedOut={false} smooth={false}>
           {({
             zoomIn,

@@ -9,7 +9,7 @@ import RaumplanSVG from "@/assets/files/GMB-Raumplan.svg";
 import readableFileSize from "../helpers/readableFileSize";
 import Spinner from "./Spinner";
 
-export default function DownlaodButton() {
+export default function DownloadButton() {
   const [popupOpen, setPopupOpen] = useState(false);
 
   return (
@@ -28,41 +28,25 @@ export default function DownlaodButton() {
         title="Format Wählen"
       >
         <div className="flex">
-          <DownloadButton
-            url={RaumplanJPG}
-            prefetch={popupOpen}
-            mime="image/jpg"
-          >
+          <Button url={RaumplanJPG} prefetch={popupOpen} mime="image/jpg">
             JPG
-          </DownloadButton>
-          <DownloadButton
-            url={RaumplanPNG}
-            prefetch={popupOpen}
-            mime="image/png"
-          >
+          </Button>
+          <Button url={RaumplanPNG} prefetch={popupOpen} mime="image/png">
             PNG
-          </DownloadButton>
-          <DownloadButton
-            url={RaumplanPDF}
-            prefetch={popupOpen}
-            mime="application/pdf"
-          >
+          </Button>
+          <Button url={RaumplanPDF} prefetch={popupOpen} mime="application/pdf">
             PDF
-          </DownloadButton>
-          <DownloadButton
-            url={RaumplanSVG}
-            prefetch={popupOpen}
-            mime="image/svg"
-          >
+          </Button>
+          <Button url={RaumplanSVG} prefetch={popupOpen} mime="image/svg">
             SVG
-          </DownloadButton>
+          </Button>
         </div>
       </Popup>
     </>
   );
 }
 
-const DownloadButton = ({
+const Button = ({
   url,
   children,
   mime,
