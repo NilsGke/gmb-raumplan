@@ -35,12 +35,12 @@ function App() {
             throw Error("map container ref is null");
           containerRef.current.innerHTML = svg;
 
-          setLoading(false);
-
           // add full height and width to new svg element
           document
             .querySelector("div > svg")
             ?.classList.add("w-full", "h-full");
+
+          setLoading(false);
 
           setup();
         });
