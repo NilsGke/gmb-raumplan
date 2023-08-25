@@ -172,6 +172,7 @@ export default function SearchBox({
           onChange={(e) => setSearchString(e.target.value)}
           onKeyDown={(e) => {
             if (e.key !== "Enter") return;
+            inputRef.current?.blur();
             const resultElement = allResults.at(0);
             if (resultElement === undefined) return;
             if (objectisEntrySign(resultElement)) {
