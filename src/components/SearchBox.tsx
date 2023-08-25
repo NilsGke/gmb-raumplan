@@ -154,7 +154,7 @@ export default function SearchBox({
       className={twMerge(
         "z-20 fixed bottom-[10px] right-4 rounded-3xl transition-all bg-zinc-800 duration-300 overflow-hidden",
         expanded
-          ? "w-full h-full sm:w-[22rem] sm:h-[30rem] rounded-none sm:rounded-xl bottom-0 right-0 sm:bottom-4 sm:right-4"
+          ? "w-full h-full sm:w-[22rem] sm:h-[30rem] sm:max-h-[94%] rounded-none sm:rounded-xl bottom-0 right-0 sm:bottom-4 sm:right-4"
           : "w-12 h-12"
       )}
     >
