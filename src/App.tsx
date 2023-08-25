@@ -6,8 +6,12 @@ import Spinner from "./components/Spinner";
 import zoomInIcon from "@assets/zoomIn.svg";
 import zoomOutIcon from "@assets/zoomOut.svg";
 import fullZoomOutIcon from "@assets/fullZoomOut.svg";
+import Map from "@assets/map.svg";
+import InfoButton from "./components/InfoButton";
+import DownlaodButton from "./components/DownlaodButton";
 
 function App() {
+  console.log(Map);
   const overlayElementRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<Data | undefined>(undefined);
@@ -24,7 +28,7 @@ function App() {
   useEffect(() => {
     if (!fetched.current) {
       fetched.current = true;
-      fetch("/map.svg")
+      fetch(Map)
         .then((res) => res.text())
         .then((svg) => {
           if (containerRef.current === null)
@@ -49,6 +53,8 @@ function App() {
         {loading && (
           <Spinner className="absolute h-20 w-20 bottom-[calc(50%-5rem/2)] left-[calc(50%-5rem/2)] transition-all duration-500" />
         )}
+        <InfoButton />
+        <DownlaodButton />
         <TransformWrapper centerOnInit centerZoomedOut={false} smooth={false}>
           {({
             zoomIn,
