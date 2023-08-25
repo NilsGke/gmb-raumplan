@@ -14,6 +14,7 @@ export default function InfoButton() {
       <button
         className="z-20 h-12 w-12 fixed flex justify-center items-center bottom-[70px] right-4 rounded-3xl bg-zinc-800"
         onClick={toggle}
+        title="Info & About"
       >
         <img className="invert h-[70%]" src={QuestionMark} alt="info" />
       </button>

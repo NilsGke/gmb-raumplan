@@ -150,6 +150,7 @@ export default function SearchBox({
 
   return (
     <div
+      title="Suchen"
       className={twMerge(
         "z-20 fixed bottom-[10px] right-4 rounded-3xl transition-all bg-zinc-800 duration-300 overflow-hidden",
         expanded
@@ -240,6 +241,10 @@ export default function SearchBox({
                       backgroundColor: room.bgColor || undefined,
                       color: room.textColor || undefined,
                     }}
+                    title={`Raum-${
+                      room.number?.content ||
+                      room.extraTexts?.find((t) => t.content !== "")?.content
+                    }`}
                   >
                     {name}
                   </ResultElement>
@@ -263,6 +268,9 @@ export default function SearchBox({
                     backgroundColor: entrySign.bgColor || undefined,
                     color: entrySign.textColor || undefined,
                   }}
+                  title={`Eingang-${
+                    entrySign.text?.content || "Ohne-Bezeichnung"
+                  }`}
                 >
                   {entrySign.text?.content || "unnamed Entry"}
                 </ResultElement>
@@ -284,17 +292,20 @@ function ResultElement({
   onClick,
   className = "",
   style,
+  title,
 }: {
   children: string | ReactNode | ReactNode[];
   onClick: () => void;
   className?: string;
   style?: CSSProperties;
+  title: string;
 }) {
   return (
     <button
       onClick={onClick}
       style={style}
       className={twMerge("h-10 rounded bg-green-200 m-1 p-2", className)}
+      title={title}
     >
       {children}
     </button>

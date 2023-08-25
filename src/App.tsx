@@ -113,21 +113,21 @@ function App() {
                 />
               )}
               <div className="fixed bottom-3 left-3 z-10 flex flex-col gap-2">
-                <ControlButton onClick={() => zoomIn()}>
+                <ControlButton title="vergrößern" onClick={() => zoomIn()}>
                   <img
                     className="invert h-2/3"
                     src={zoomInIcon}
                     alt="zoom in"
                   />
                 </ControlButton>
-                <ControlButton onClick={() => zoomOut()}>
+                <ControlButton title="verkleinern" onClick={() => zoomOut()}>
                   <img
                     className="invert h-2/3"
                     src={zoomOutIcon}
                     alt="zoom out"
                   />
                 </ControlButton>
-                <ControlButton onClick={() => resetTransform()}>
+                <ControlButton title="Reset" onClick={() => resetTransform()}>
                   <img
                     className="invert h-2/3"
                     src={fullZoomOutIcon}
@@ -162,14 +162,17 @@ function App() {
 function ControlButton({
   children,
   onClick,
+  title,
 }: {
   children: ReactElement | string;
   onClick: () => void;
+  title: string;
 }) {
   return (
     <button
       className="rounded-full cursor-pointer aspect-square bg-zinc-800 h-10 text-white flex justify-center items-center"
       onClick={onClick}
+      title={title}
     >
       {children}
     </button>
