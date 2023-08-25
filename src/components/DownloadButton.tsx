@@ -109,7 +109,7 @@ const Button = ({
 
   return (
     <button
-      className="m-4 p-2 rounded-xl bg-zinc-100 border border-zinc-400 flex flex-col justify-center items-center h-16 w-20"
+      className="m-1 p-2 whitespace-nowrap rounded-xl bg-zinc-100 border border-zinc-400 flex flex-col justify-center items-center h-16 w-20"
       onClick={download}
     >
       {children} <br />
