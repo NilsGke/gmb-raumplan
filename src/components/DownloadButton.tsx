@@ -61,14 +61,23 @@ const Button = ({
   const readableSize = readableFileSize(rawSize || 0, true, 0);
 
   const data = useRef<Blob | null>(null);
+  const idleRequest = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!prefetch || rawSize !== undefined) return;
+    if (idleRequest.current !== null || rawSize !== undefined) return;
 
-    fetch(url).then(async (res) => {
-      setRawSize(Number(res.headers.get("content-length")));
-      data.current = await res.blob();
-    });
+    idleRequest.current = requestIdleCallback(
+      () =>
+        fetch(url).then(async (res) => {
+          setRawSize(Number(res.headers.get("content-length"))); // initial size to display
+          const file = await res.blob();
+          setRawSize(file.size); // fallback if content-length provided
+          data.current = file;
+        }),
+      {
+        timeout: 100,
+      }
+    );
   }, [url, prefetch, rawSize]);
 
   const download = () => {
