@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       boxShadow: {
-        key: "0 2px 0 0 #666666",
+        key: "0 2px 0 0 #bbbbbb",
       },
     },
   },
