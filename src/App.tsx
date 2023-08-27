@@ -58,7 +58,7 @@ function App() {
         <TransformWrapper
           centerOnInit
           centerZoomedOut
-          // smooth={false}
+          smooth={false}
           limitToBounds
         >
           {({
