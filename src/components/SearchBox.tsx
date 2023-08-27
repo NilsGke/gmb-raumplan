@@ -94,7 +94,10 @@ export default function SearchBox({
       entrySign.text?.content.toLowerCase().includes(searchLower)
     )
     .sort((a, b) =>
-      (a.text?.content || "") >= (b.text?.content || "") ? -1 : 1
+      parseInt(a.text?.content.replace("E", "") || "0") <
+      parseInt(b.text?.content.replace("E", "") || "0")
+        ? -1
+        : 1
     );
 
   const allResults = [...rooms, ...entrySigns];
