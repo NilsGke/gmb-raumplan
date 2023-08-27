@@ -1,13 +1,24 @@
 import DownloadIcon from "@/assets/download.svg";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useState } from "react";
 import Popup from "./Popup";
+import OpenInNewIcon from "@/assets/openInNew.svg";
 // downloadFiles
-import RaumplanJPG from "@/assets/files/GMB-Raumplan.jpg";
-import RaumplanPDF from "@/assets/files/GMB-Raumplan.pdf";
-import RaumplanPNG from "@/assets/files/GMB-Raumplan.png";
-import RaumplanSVG from "@/assets/files/GMB-Raumplan.svg";
-import readableFileSize from "../helpers/readableFileSize";
-import Spinner from "./Spinner";
+// JPG
+import RaumplanJPG_x100 from "@/assets/files/GMB-Raumplan_Layer__x100.jpg";
+import RaumplanJPG_x250 from "@/assets/files/GMB-Raumplan_Layer__x250.jpg";
+import RaumplanJPG_x500 from "@/assets/files/GMB-Raumplan_Layer__x500.jpg";
+import RaumplanJPG_x750 from "@/assets/files/GMB-Raumplan_Layer__x750.jpg";
+import RaumplanJPG_x1000 from "@/assets/files/GMB-Raumplan_Layer__x1000.jpg";
+// PNG
+import RaumplanPNG_x100 from "@/assets/files/GMB-Raumplan_Layer__x100.png";
+import RaumplanPNG_x250 from "@/assets/files/GMB-Raumplan_Layer__x250.png";
+import RaumplanPNG_x500 from "@/assets/files/GMB-Raumplan_Layer__x500.png";
+import RaumplanPNG_x750 from "@/assets/files/GMB-Raumplan_Layer__x750.png";
+import RaumplanPNG_x1000 from "@/assets/files/GMB-Raumplan_Layer__x1000.png";
+// Other
+import RaumplanSVG from "@/assets/files/GMB-Raumplan_Layer.svg";
+import RaumplanPDF from "@/assets/files/GMB-Raumplan_Layer.pdf";
+import { twMerge } from "tailwind-merge";
 
 export default function DownloadButton() {
   const [popupOpen, setPopupOpen] = useState(false);
@@ -27,93 +38,127 @@ export default function DownloadButton() {
         close={() => setPopupOpen(false)}
         title="Format Wählen"
       >
-        <div className="flex">
-          <Button url={RaumplanJPG} prefetch={popupOpen} mime="image/jpg">
-            JPG
-          </Button>
-          <Button url={RaumplanPNG} prefetch={popupOpen} mime="image/png">
-            PNG
-          </Button>
-          <Button url={RaumplanPDF} prefetch={popupOpen} mime="application/pdf">
-            PDF
-          </Button>
-          <Button url={RaumplanSVG} prefetch={popupOpen} mime="image/svg">
-            SVG
-          </Button>
+        <div className="flex gap-4">
+          <Col title="JPG">
+            <Button url={RaumplanJPG_x100} mime="image/jpg">
+              x100
+            </Button>
+            <Button url={RaumplanJPG_x250} mime="image/jpg">
+              x250
+            </Button>
+            <Button url={RaumplanJPG_x500} mime="image/jpg" highlighted>
+              x500
+            </Button>
+            <Button url={RaumplanJPG_x750} mime="image/jpg">
+              x750
+            </Button>
+            <Button url={RaumplanJPG_x1000} mime="image/jpg">
+              x1000
+            </Button>
+          </Col>
+
+          <Col title={"PNG"}>
+            <Button url={RaumplanPNG_x100} mime="image/png">
+              x100
+            </Button>
+            <Button url={RaumplanPNG_x250} mime="image/png">
+              x250
+            </Button>
+            <Button url={RaumplanPNG_x500} mime="image/png" highlighted>
+              x500
+            </Button>
+            <Button url={RaumplanPNG_x750} mime="image/png">
+              x750
+            </Button>
+            <Button url={RaumplanPNG_x1000} mime="image/png">
+              x1000
+            </Button>
+          </Col>
+
+          <Col title="Andere">
+            <Button url={RaumplanSVG} mime="image/svg+xml" highlighted>
+              SVG
+            </Button>
+            <Button url={RaumplanPDF} mime="application/pdf" highlighted>
+              PDF
+            </Button>
+          </Col>
         </div>
       </Popup>
     </>
   );
 }
 
+const Col = ({ title, children }: { title: string; children: ReactNode }) => (
+  <div className="flex flex-col items-center">
+    <h2>{title}</h2>
+    <div>{children}</div>
+  </div>
+);
+
 const Button = ({
   url,
   children,
   mime,
-  prefetch,
+  highlighted,
 }: {
   url: string;
   children: ReactNode;
   mime: string;
-  prefetch: boolean;
+  highlighted?: boolean;
 }) => {
-  const [rawSize, setRawSize] = useState<number | undefined>(undefined);
-  const readableSize = readableFileSize(rawSize || 0, true, 0);
-
-  const data = useRef<Blob | null>(null);
-  const idleRequest = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (idleRequest.current !== null || rawSize !== undefined) return;
-
-    idleRequest.current = requestIdleCallback(
-      () =>
-        fetch(url).then(async (res) => {
-          setRawSize(Number(res.headers.get("content-length"))); // initial size to display
-          const file = await res.blob();
-          setRawSize(file.size); // fallback if content-length provided
-          data.current = file;
-        }),
-      {
-        timeout: 100,
-      }
-    );
-  }, [url, prefetch, rawSize]);
-
   const download = () => {
-    if (data.current === null)
-      return alert(`file not avalible, please download from: ${url}`);
+    fetch(url).then(async (res) => {
+      const file = await res.blob();
 
-    const match = mime.match(/\/(\w+)(?:\?|$)/);
-    if (match === null)
-      return alert("could not extract fileExtension from mimetype");
-    const extension = match[1];
+      const match = mime.match(/\/(\w+)(?:\?|$)/);
+      if (match === null)
+        return alert("could not extract fileExtension from mimetype");
+      const extension = match[1];
 
-    const downloadURL = window.URL.createObjectURL(
-      new Blob([data.current], {
-        type: mime,
-      })
-    );
+      const downloadURL = window.URL.createObjectURL(
+        new Blob([file], {
+          type: mime,
+        })
+      );
 
-    const element = document.createElement("a");
-    element.setAttribute("href", downloadURL);
-    element.setAttribute("download", `GMB-Raumplan.${extension}`);
+      const element = document.createElement("a");
+      element.setAttribute("href", downloadURL);
+      element.setAttribute("download", `GMB-Raumplan.${extension}`);
 
-    element.style.display = "none";
-    document.body.appendChild(element);
+      element.style.display = "none";
+      document.body.appendChild(element);
 
-    element.click();
+      element.click();
 
-    document.body.removeChild(element);
+      document.body.removeChild(element);
+    });
   };
 
   return (
-    <button
-      className="m-1 p-2 whitespace-nowrap rounded-xl bg-zinc-100 border border-zinc-400 flex flex-col justify-center items-center h-16 w-20"
-      onClick={download}
-    >
-      {children} <br />
-      {rawSize ? readableSize : <Spinner className="h-5 w-5 opacity-60" />}
-    </button>
+    <div className="flex justify-center items-center">
+      <button
+        className={twMerge(
+          "group relative m-1 px-3 py-1  whitespace-nowrap rounded-xl bg-zinc-100 border border-zinc-400 flex flex-col justify-center items-center hover:bg-zinc-200",
+          highlighted
+            ? " outline outline-1  outline-blue-600 border-blue-600"
+            : ""
+        )}
+        onClick={download}
+        title={highlighted ? "Empfohlene Auflösung" : undefined}
+      >
+        {children}
+      </button>
+
+      <a
+        href={url}
+        onClick={(e) => e.stopPropagation()}
+        className="group-hover:bg-zinc-100 !hover:bg-zinc-300 "
+        target="_blank"
+        title="in neuem Tab öffnen"
+      >
+        <img src={OpenInNewIcon} alt="open in new tab" />
+      </a>
+    </div>
   );
 };
