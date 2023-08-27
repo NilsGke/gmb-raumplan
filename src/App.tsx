@@ -55,7 +55,12 @@ function App() {
         )}
         <InfoButton />
         <DownloadButton />
-        <TransformWrapper centerOnInit centerZoomedOut={false} smooth={false}>
+        <TransformWrapper
+          centerOnInit
+          centerZoomedOut
+          // smooth={false}
+          limitToBounds
+        >
           {({
             zoomIn,
             zoomOut,
@@ -74,7 +79,7 @@ function App() {
                       element,
                       window.innerWidth < 800 ? 3 : 2,
                       500,
-                      "easeInQuad"
+                      "easeOut"
                     )
                   }
                   zoomIn={() => zoomIn()}
@@ -127,7 +132,10 @@ function App() {
                     alt="zoom out"
                   />
                 </ControlButton>
-                <ControlButton title="Reset" onClick={() => resetTransform()}>
+                <ControlButton
+                  title="zurücksetzten"
+                  onClick={() => resetTransform()}
+                >
                   <img
                     className="invert h-2/3"
                     src={fullZoomOutIcon}
