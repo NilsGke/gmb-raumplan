@@ -37,8 +37,8 @@ export default function InfoButton() {
           <Item
             text="Github:"
             chip={
-              <a href="https://github.com/NilsGke/floor-map" target="_blank">
-                github.com/NilsGke/floor-map
+              <a href="https://github.com/NilsGke/gmb-raumplan" target="_blank">
+                github.com/NilsGke/gmb-raumplan
               </a>
             }
           />
