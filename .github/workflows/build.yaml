@@ -36,11 +36,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Create Tag
+        run: git tag v1.0.0
+        if: success()
+
+      - name: Push Tag
+        run: git push origin v1.0.0
+        if: success()
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/**
+          tag_name: v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
 
