@@ -24,6 +24,13 @@ jobs:
       - name: Build with Vite
         run: npm run build
 
+      - name: Configure Git identity
+        run: |
+          git config user.email "actions@example.com"
+          git config user.name "GitHub Actions"
+        if: success() # Only configure Git identity if the build was successful
+
+
       - name: Create a tag with a fixed version
         run: git tag -a v1.0 -m "Release v1.0"
         if: success() # Only create a tag if the build was successful
