@@ -39,12 +39,12 @@ jobs:
 
       - name: Zip dist directory
         run: |
-          zip -r dist.zip dist
+          zip -r dist.zip dist/*
 
       - name: Upload zip to release
         uses: actions/upload-artifact@v2
         with:
-          name: dist
+          name: website
           path: dist.zip
 
       - name: Create Release
