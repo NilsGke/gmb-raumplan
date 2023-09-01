@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,14 +28,6 @@ jobs:
 
       - name: Build Vite project
         run: npm run build
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
       - name: Create Tag
         run: git tag v1.0.0
