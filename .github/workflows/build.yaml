@@ -1,9 +1,9 @@
-name: Vite Build and Publish
+name: Vite Build and Publish Release
 
 on:
   push:
     branches:
-      - main # Change this to your main branch name
+      - main
 
 jobs:
   build:
@@ -16,27 +16,18 @@ jobs:
       - name: Install Node.js and dependencies
         uses: actions/setup-node@v2
         with:
-          node-version: 14 # Adjust the Node.js version as needed
+          node-version: 14
 
       - name: Install dependencies
         run: npm install
 
       - name: Build with Vite
-        run: npm run build # Replace with your build script if different
+        run: npm run build
 
-      - name: Create a build directory
-        run: mkdir -p build
-
-      - name: Copy build artifacts
-        run: cp -r dist/* build/
-
-      - name: Commit and push build artifacts
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add build
-          git commit -m "Add Vite build artifacts"
-          git push
-
-      - name: Clean up
-        run: rm -rf build
+      - name: Create a release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/* # Upload all files in the build directory
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
