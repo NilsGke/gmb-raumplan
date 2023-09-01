@@ -1,0 +1,42 @@
+name: Vite Build and Publish
+
+on:
+  push:
+    branches:
+      - main # Change this to your main branch name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js and dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14 # Adjust the Node.js version as needed
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build with Vite
+        run: npm run build # Replace with your build script if different
+
+      - name: Create a build directory
+        run: mkdir -p build
+
+      - name: Copy build artifacts
+        run: cp -r dist/* build/
+
+      - name: Commit and push build artifacts
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add build
+          git commit -m "Add Vite build artifacts"
+          git push
+
+      - name: Clean up
+        run: rm -rf build
