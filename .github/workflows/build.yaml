@@ -43,6 +43,8 @@ jobs:
       - name: Push Tag
         run: git push origin v1.0.0
         if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
 
       - name: Create Release
         id: create_release
