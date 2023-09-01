@@ -24,6 +24,14 @@ jobs:
       - name: Build with Vite
         run: npm run build
 
+      - name: Create a tag
+        run: git tag -a v1.0 -m "Release v1.0" # You can use any version number you prefer
+        if: success() # Only create a tag if the build was successful
+
+      - name: Push the tag to the repository
+        run: git push origin v1.0 # Push the tag you created
+        if: success() # Only push the tag if it was created
+
       - name: Create a release
         id: create_release
         uses: softprops/action-gh-release@v1
