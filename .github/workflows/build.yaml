@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "version.txt"
 
 jobs:
   build_and_deploy:
@@ -29,12 +31,16 @@ jobs:
       - name: Build Vite project
         run: npm run build
 
+      - name: Read version number
+        id: get_version
+        run: echo "::set-output name=version::$(cat version.txt)"
+
       - name: Create Tag
-        run: git tag v1.0.0
+        run: git tag -a v${{ steps.get_version.outputs.version }} -m "Version ${{ steps.get_version.outputs.version }}"
         if: success()
 
       - name: Push Tag
-        run: git push origin v1.0.0
+        run: git push origin v${{ steps.get_version.outputs.version }}
         if: success()
 
       - name: Zip dist directory
@@ -52,8 +58,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist.zip
-          name: dist
-          tag_name: v1.0.0
+          tag_name: v${{ steps.get_version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
 
