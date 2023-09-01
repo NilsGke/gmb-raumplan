@@ -35,6 +35,15 @@ jobs:
         id: get_version
         run: echo "::set-output name=version::$(cat version.txt)"
 
+      - name: Authenticate with GitHub Token
+        run: |
+          git config --global credential.helper store
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Bot Name"
+          git remote set-url origin "https://github.com/${{ github.repository }}.git"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Tag
         run: git tag -a v${{ steps.get_version.outputs.version }}
         if: success()
