@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Build Vite project
-        run: npm run build 
+        run: npm run build
 
   release:
     needs: build
@@ -41,4 +41,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
 
       - name: Get Release URL
-        run: echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
+        run: |
+          echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
