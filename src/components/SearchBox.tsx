@@ -220,7 +220,7 @@ export default function SearchBox({
         <div>
           {rooms.length > 0 && (
             <ResultCategory name="Räume">
-              {rooms.map((room) => {
+              {rooms.map((room, index) => {
                 const extranames = room.extraTexts
                   ?.map((text) => text.content)
                   .join(", ");
@@ -234,6 +234,11 @@ export default function SearchBox({
 
                 return (
                   <ResultElement
+                    key={
+                      room.number?.content ||
+                      room.extraTexts?.at(0)?.content ||
+                      index
+                    }
                     onClick={() => {
                       if (room.roomFloorElement)
                         highlightElement(room.roomFloorElement);
