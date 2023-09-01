@@ -1,4 +1,4 @@
-name: Vite Build and Publish Release
+name: Build and Release
 
 on:
   push:
@@ -10,40 +10,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install Node.js and dependencies
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build with Vite
-        run: npm run build
+      - name: Build Vite project
+        run: npm run build 
 
-      - name: Configure Git identity
-        run: |
-          git config user.email "actions@example.com"
-          git config user.name "GitHub Actions"
-        if: success() # Only configure Git identity if the build was successful
+  release:
+    needs: build
+    runs-on: ubuntu-latest
 
-      - name: Create a tag with a fixed version
-        run: git tag -a v1.0 -m "Release v1.0"
-        if: success() # Only create a tag if the build was successful
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Push the tag to the repository
-        run: git push origin v1.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
-        if: success() # Only push the tag if it was created
-
-      - name: Create a release
+      - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/* # Upload all files in the build directory
+          files: dist/**
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
+
+      - name: Get Release URL
+        run: echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
