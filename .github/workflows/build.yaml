@@ -41,10 +41,20 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*
-          tag_name: v1.0.0
+          files: dist.zip # Include the zip file
+          tag_name: v1.0.0 # Replace with the same version as above
         env:
           GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
+
+      - name: Zip dist directory
+        run: |
+          zip -r dist.zip dist
+
+      - name: Upload zip to release
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist.zip
 
       - name: Get Release URL
         run: |
