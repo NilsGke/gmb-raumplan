@@ -235,9 +235,8 @@ export default function SearchBox({
                 return (
                   <ResultElement
                     key={
-                      room.number?.content ||
-                      room.extraTexts?.at(0)?.content ||
-                      index
+                      (room.number?.content || "") +
+                        (room.extraTexts?.at(0)?.content || "") || index
                     }
                     onClick={() => {
                       if (room.roomFloorElement)
@@ -264,8 +263,9 @@ export default function SearchBox({
 
           {entrySigns.length > 0 && (
             <ResultCategory name="Eingänge">
-              {entrySigns.map((entrySign) => (
+              {entrySigns.map((entrySign, index) => (
                 <ResultElement
+                  key={entrySign.text?.content || index}
                   onClick={() => {
                     if (entrySign.rectElement)
                       highlightElement(entrySign.rectElement);
