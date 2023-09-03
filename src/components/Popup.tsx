@@ -19,21 +19,21 @@ export default function Popup({
   return (
     <div
       className={twMerge(
-        "w-full h-full fixed top-0 left-0 backdrop-blur-sm backdrop-brightness-50 flex justify-center items-center opacity-0 pointer-events-none transition-opacity",
-        open && " opacity-100 z-50 pointer-events-auto"
+        "pointer-events-none fixed left-0 top-0 flex h-full w-full items-center justify-center opacity-0 backdrop-blur-sm backdrop-brightness-50 transition-opacity",
+        open && " pointer-events-auto z-50 opacity-100",
       )}
       onClick={(e) => e.target === e.currentTarget && close()}
     >
-      <div className="p-5 bg-white rounded-3xl relative max-w-[90%]">
+      <div className="relative max-w-[90%] rounded-3xl bg-white p-5">
         <button
-          className="absolute top-5 right-5 h-7 w-7 aspect-square flex justify-center items-center"
+          className="absolute right-5 top-5 flex aspect-square h-7 w-7 items-center justify-center"
           onClick={() => close()}
           title="schließen"
         >
-          <img className="h-4/5 aspect-square" src={CloseIcon} alt="close" />
+          <img className="aspect-square h-4/5" src={CloseIcon} alt="close" />
         </button>
 
-        <h1 className="text-2xl mr-10">{title}</h1>
+        <h1 className="mr-10 text-2xl">{title}</h1>
 
         {children}
       </div>

@@ -49,9 +49,9 @@ function App() {
 
   return (
     <>
-      <div className="absolute w-screen h-screen">
+      <div className="absolute h-screen w-screen">
         {loading && (
-          <Spinner className="absolute h-20 w-20 bottom-[calc(50%-5rem/2)] left-[calc(50%-5rem/2)] transition-all duration-500" />
+          <Spinner className="absolute bottom-[calc(50%-5rem/2)] left-[calc(50%-5rem/2)] h-20 w-20 transition-all duration-500" />
         )}
         <InfoButton />
         <DownloadButton />
@@ -71,7 +71,7 @@ function App() {
           }) => (
             <>
               {data === undefined ? (
-                <Spinner className="fixed h-10 w-10 bottom-5 right-5" />
+                <Spinner className="fixed bottom-5 right-5 h-10 w-10" />
               ) : (
                 <SearchBox
                   zoomToElement={(element: HTMLElement) =>
@@ -79,7 +79,7 @@ function App() {
                       element,
                       window.innerWidth < 800 ? 3 : 2,
                       500,
-                      "easeOut"
+                      "easeOut",
                     )
                   }
                   zoomIn={() => zoomIn()}
@@ -110,7 +110,7 @@ function App() {
                       current.positionY + y,
                       current.scale,
                       100,
-                      "easeOutCubic"
+                      "easeOutCubic",
                     );
                   }}
                   overlayRef={overlayElementRef}
@@ -120,14 +120,14 @@ function App() {
               <div className="fixed bottom-3 left-3 z-10 flex flex-col gap-2">
                 <ControlButton title="vergrößern" onClick={() => zoomIn()}>
                   <img
-                    className="invert h-2/3"
+                    className="h-2/3 invert"
                     src={zoomInIcon}
                     alt="zoom in"
                   />
                 </ControlButton>
                 <ControlButton title="verkleinern" onClick={() => zoomOut()}>
                   <img
-                    className="invert h-2/3"
+                    className="h-2/3 invert"
                     src={zoomOutIcon}
                     alt="zoom out"
                   />
@@ -137,7 +137,7 @@ function App() {
                   onClick={() => resetTransform()}
                 >
                   <img
-                    className="invert h-2/3"
+                    className="h-2/3 invert"
                     src={fullZoomOutIcon}
                     alt="full zoom out"
                   />
@@ -149,12 +149,12 @@ function App() {
                 contentClass="!w-full !h-full relative"
               >
                 <div
-                  className="h-full w-full flex justify-center items-center"
+                  className="flex h-full w-full items-center justify-center"
                   ref={containerRef}
                 />
-                <div className="absolute top-0 left-0 pointer-events-none h-full w-full">
+                <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
                   <div
-                    className="h-full w-full relative"
+                    className="relative h-full w-full"
                     ref={overlayElementRef}
                   />
                 </div>
@@ -178,7 +178,7 @@ function ControlButton({
 }) {
   return (
     <button
-      className="rounded-full cursor-pointer aspect-square bg-zinc-800 h-10 text-white flex justify-center items-center"
+      className="flex aspect-square h-10 cursor-pointer items-center justify-center rounded-full bg-zinc-800 text-white"
       onClick={onClick}
       title={title}
     >

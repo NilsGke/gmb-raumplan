@@ -68,11 +68,11 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
 
   // remove images
   elements.forEach((elm) =>
-    elm.constructor.name === "SVGImageElement" ? elm.remove() : null
+    elm.constructor.name === "SVGImageElement" ? elm.remove() : null,
   );
 
   data.buildings = Array.from(
-    svg.querySelectorAll<SVGGElement>(".building")
+    svg.querySelectorAll<SVGGElement>(".building"),
   ).map((buildingGroupElement) => {
     const building: Building = {
       buildingGroupElement: buildingGroupElement,
@@ -85,7 +85,7 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
     if (building.name === null)
       console.error(
         'Could not extract name from building! Please add inkscape:label="yourBuildingName" to element.',
-        buildingGroupElement
+        buildingGroupElement,
       );
 
     building.outlineElement = buildingGroupElement.querySelector<
@@ -95,7 +95,7 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
     if (building.outlineElement === null) {
       console.error(
         `Could not find outline for building: "${building.name}"`,
-        buildingGroupElement
+        buildingGroupElement,
       );
     }
 
@@ -104,35 +104,35 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
     if (roomContainerElement === null)
       console.error(
         `Could not find room container for building: "${building.name}"`,
-        buildingGroupElement
+        buildingGroupElement,
       );
 
     if (roomContainerElement === null) building.rooms = [];
     else
       building.rooms = (
         Array.from(roomContainerElement.children).filter(
-          (elm) => elm.constructor.name === "SVGGElement"
+          (elm) => elm.constructor.name === "SVGGElement",
         ) as SVGGElement[]
       ).map((roomGroup) => {
         const textElements = roomGroup.querySelectorAll<SVGTextElement>("text");
         if (textElements.length === 0)
           console.error(
             "could not find a text element inside room group",
-            roomGroup
+            roomGroup,
           );
 
         const numberElement = Array.from(textElements).find((element) =>
-          roomNumberRegex.test(element.textContent || "")
+          roomNumberRegex.test(element.textContent || ""),
         );
         if (numberElement === undefined)
           console.error(
             "could not find text element that satisfies room number regex",
-            roomGroup
+            roomGroup,
           );
 
         const extraTexts: Room["extraTexts"] = Array.from(textElements)
           .filter(
-            (element) => element.textContent !== numberElement?.textContent
+            (element) => element.textContent !== numberElement?.textContent,
           )
           .map((element) => ({
             element,

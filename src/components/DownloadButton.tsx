@@ -29,9 +29,9 @@ export default function DownloadButton() {
       <button
         onClick={() => setPopupOpen(true)}
         title="download Raumplen"
-        className="z-20 h-12 w-12 fixed flex justify-center items-center bottom-[130px] right-4 rounded-3xl bg-zinc-800"
+        className="fixed bottom-[130px] right-4 z-20 flex h-12 w-12 items-center justify-center rounded-3xl bg-zinc-800"
       >
-        <img className="invert w-[60%]" src={DownloadIcon} alt="download" />
+        <img className="w-[60%] invert" src={DownloadIcon} alt="download" />
       </button>
 
       <Popup
@@ -174,13 +174,13 @@ const Button = ({
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex items-center justify-center">
       <button
         className={twMerge(
-          "group relative m-1 px-3 py-1  whitespace-nowrap rounded-xl bg-zinc-100 border border-zinc-400 flex flex-col justify-center items-center hover:bg-zinc-200",
+          "group relative m-1 flex flex-col  items-center justify-center whitespace-nowrap rounded-xl border border-zinc-400 bg-zinc-100 px-3 py-1 hover:bg-zinc-200",
           highlighted
-            ? " outline outline-1  outline-blue-600 border-blue-600"
-            : ""
+            ? " border-blue-600 outline  outline-1 outline-blue-600"
+            : "",
         )}
         onClick={() => {
           if (downloaded.current === null)
@@ -197,7 +197,7 @@ const Button = ({
           if (downloaded.current === null) download().then(openInNewTab);
           else openInNewTab(downloaded.current);
         }}
-        className="group-hover:bg-zinc-100 !hover:bg-zinc-300 "
+        className="!hover:bg-zinc-300 group-hover:bg-zinc-100 "
         title="in neuem Tab öffnen"
       >
         {downloading ? (

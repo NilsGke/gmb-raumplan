@@ -8,7 +8,7 @@ export default function flattenHTMLCollectionTree(arr: HTMLCollection) {
       ? elements.push(...flattenHTMLCollectionTree(element.children))
       : elementIsSVGElement(element)
       ? elements.push(element)
-      : null
+      : null,
   );
 
   return elements;

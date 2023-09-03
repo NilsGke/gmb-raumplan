@@ -86,19 +86,20 @@ export default function SearchBox({
       (room) =>
         room.number?.content.toLowerCase().includes(searchLower) ||
         room.extraTexts?.some((textElement) =>
-          textElement.content.toLowerCase().includes(searchLower)
-        )
+          textElement.content.toLowerCase().includes(searchLower),
+        ),
     );
 
   const entrySigns = data.entrySigns
-    .filter((entrySign) =>
-      entrySign.text?.content.toLowerCase().includes(searchLower)
+    .filter(
+      (entrySign) =>
+        entrySign.text?.content.toLowerCase().includes(searchLower),
     )
     .sort((a, b) =>
       parseInt(a.text?.content.replace("E", "") || "0") <
       parseInt(b.text?.content.replace("E", "") || "0")
         ? -1
-        : 1
+        : 1,
     );
 
   const allResults = [...rooms, ...entrySigns];
@@ -143,7 +144,7 @@ export default function SearchBox({
           easing: "ease-in-out",
           direction: "alternate",
           iterations: 10,
-        }
+        },
       );
     });
 
@@ -156,20 +157,20 @@ export default function SearchBox({
     <div
       title="Suchen"
       className={twMerge(
-        "z-20 fixed bottom-[10px] right-4 rounded-3xl transition-all bg-zinc-800 duration-300 overflow-hidden",
+        "fixed bottom-[10px] right-4 z-20 overflow-hidden rounded-3xl bg-zinc-800 transition-all duration-300",
         expanded
-          ? "w-full h-full sm:w-[22rem] sm:h-[30rem] sm:max-h-[94%] rounded-none sm:rounded-xl bottom-0 right-0 sm:bottom-4 sm:right-4"
-          : "w-12 h-12"
+          ? "bottom-0 right-0 h-full w-full rounded-none sm:bottom-4 sm:right-4 sm:h-[30rem] sm:max-h-[94%] sm:w-[22rem] sm:rounded-xl"
+          : "h-12 w-12",
       )}
     >
-      <header className="w-full h-10 flex justify-between relative ">
+      <header className="relative flex h-10 w-full justify-between ">
         <input
           type="search"
           className={twMerge(
-            "rounded bg-zinc-700 m-4 h-10  text-white transition-all duration-300",
+            "m-4 h-10 rounded bg-zinc-700  text-white transition-all duration-300",
             expanded
-              ? "w-full m-3 mr-6 p-2 opacity-100"
-              : "w-0 m-0 p-0 opacity-0"
+              ? "m-3 mr-6 w-full p-2 opacity-100"
+              : "m-0 w-0 p-0 opacity-0",
           )}
           ref={inputRef}
           value={searchString}
@@ -193,23 +194,23 @@ export default function SearchBox({
         />
         <button
           className={twMerge(
-            " flex justify-center items-center transition-all mt-0 mr-0 duration-300",
-            expanded ? "mt-3 mr-4 h-10 w-10" : "h-12 w-12"
+            " mr-0 mt-0 flex items-center justify-center transition-all duration-300",
+            expanded ? "mr-4 mt-3 h-10 w-10" : "h-12 w-12",
           )}
           onClick={() => setExpanded((prev) => !prev)}
         >
           <img
             className={twMerge(
-              "absolute invert aspect-square w-8 transition-all duration-300",
-              expanded ? "opacity-0" : "opacity-100"
+              "absolute aspect-square w-8 invert transition-all duration-300",
+              expanded ? "opacity-0" : "opacity-100",
             )}
             src={SearchIcon}
             alt="search icon"
           />
           <img
             className={twMerge(
-              "absolute invert aspect-square transition-all w-8 opacity-0 duration-300",
-              expanded ? "opacity-100" : ""
+              "absolute aspect-square w-8 opacity-0 invert transition-all duration-300",
+              expanded ? "opacity-100" : "",
             )}
             src={CloseIcon}
             alt="search icon"
@@ -217,7 +218,7 @@ export default function SearchBox({
         </button>
       </header>
 
-      <section className="mt-4 p-2 w-full h-[calc(100%-64px-10px)] overflow-y-scroll scroll-px-2 scrollbar ">
+      <section className="scrollbar mt-4 h-[calc(100%-64px-10px)] w-full scroll-px-2 overflow-y-scroll p-2 ">
         <div>
           {rooms.length > 0 && (
             <ResultCategory name="Räume">
@@ -243,7 +244,7 @@ export default function SearchBox({
                       if (room.roomFloorElement)
                         highlightElement(room.roomFloorElement);
                       zoomToElement(
-                        room.roomFloorElement as unknown as HTMLElement
+                        room.roomFloorElement as unknown as HTMLElement,
                       );
                     }}
                     style={{
@@ -271,7 +272,7 @@ export default function SearchBox({
                     if (entrySign.rectElement)
                       highlightElement(entrySign.rectElement);
                     zoomToElement(
-                      entrySign.rectElement as unknown as HTMLElement
+                      entrySign.rectElement as unknown as HTMLElement,
                     );
                   }}
                   style={{
@@ -314,7 +315,7 @@ function ResultElement({
     <button
       onClick={onClick}
       style={style}
-      className={twMerge("h-10 rounded bg-green-200 m-1 p-2", className)}
+      className={twMerge("m-1 h-10 rounded bg-green-200 p-2", className)}
       title={title}
     >
       {children}
@@ -333,7 +334,7 @@ function ResultCategory({
   return (
     <div>
       <details open>
-        <summary className="text-zinc-300 text-sm cursor-pointer">
+        <summary className="cursor-pointer text-sm text-zinc-300">
           {name}
         </summary>
         <div ref={parent}>{...children}</div>

@@ -12,11 +12,11 @@ export default function InfoButton() {
   return (
     <>
       <button
-        className="z-20 h-12 w-12 fixed flex justify-center items-center bottom-[70px] right-4 rounded-3xl bg-zinc-800"
+        className="fixed bottom-[70px] right-4 z-20 flex h-12 w-12 items-center justify-center rounded-3xl bg-zinc-800"
         onClick={toggle}
         title="Info & About"
       >
-        <img className="invert h-[70%]" src={QuestionMark} alt="info" />
+        <img className="h-[70%] invert" src={QuestionMark} alt="info" />
       </button>
 
       <Popup
@@ -24,7 +24,7 @@ export default function InfoButton() {
         close={() => setPopupOpen(false)}
         title="GMB - Raumplan"
       >
-        <div className="flex flex-col gap-2 my-6">
+        <div className="my-6 flex flex-col gap-2">
           <h2 className="text-lg">Feedback & Bugs: </h2>
           <Item
             text="Email:"
@@ -45,8 +45,8 @@ export default function InfoButton() {
         </div>
 
         <details open>
-          <summary className="cursor-pointer mb-2">Keyboard Shortcuts</summary>
-          <div className="flex flex-col gap-1 pl-4 mb-2">
+          <summary className="mb-2 cursor-pointer">Keyboard Shortcuts</summary>
+          <div className="mb-2 flex flex-col gap-1 pl-4">
             <Row>
               Hilfe:
               <Key>?</Key>
@@ -70,7 +70,7 @@ export default function InfoButton() {
           </div>
         </details>
 
-        <p className="text-zinc-400 mt-6 text-sm">- Nils Goeke</p>
+        <p className="mt-6 text-sm text-zinc-400">- Nils Goeke</p>
       </Popup>
     </>
   );
@@ -83,7 +83,7 @@ const Item = ({ text, chip }: { text?: ReactNode; chip: ReactNode }) => (
 );
 
 const Chip = ({ children }: { children?: ReactNode }) => (
-  <div className="bg-gray-200 rounded-full px-2 py-0">{children}</div>
+  <div className="rounded-full bg-gray-200 px-2 py-0">{children}</div>
 );
 
 const Row = ({ children }: { children: ReactNode }) => (
@@ -95,7 +95,7 @@ const Key = ({ children: key }: { children: string }) => (
     onClick={() =>
       document.dispatchEvent(new KeyboardEvent("keydown", { key }))
     }
-    className="rounded-md text-sm bg-zinc-200 px-1 border border-transparent shadow-key -translate-y-[2px] w-min inline-block ml-2 active:translate-y-0  active:border-zinc-400 active:shadow-none"
+    className="ml-2 inline-block w-min -translate-y-[2px] rounded-md border border-transparent bg-zinc-200 px-1 text-sm shadow-key active:translate-y-0  active:border-zinc-400 active:shadow-none"
   >
     {key}
   </button>
