@@ -19,6 +19,7 @@ import RaumplanPNG_x1000 from "@/assets/files/GMB-Raumplan_Layer__x1000.png";
 import RaumplanSVG from "@/assets/files/GMB-Raumplan_Layer.svg";
 import RaumplanPDF from "@/assets/files/GMB-Raumplan_Layer.pdf";
 import { twMerge } from "tailwind-merge";
+import Spinner from "./Spinner";
 
 export default function DownloadButton() {
   const [popupOpen, setPopupOpen] = useState(false);
@@ -107,18 +108,22 @@ const Button = ({
   mime: string;
   highlighted?: boolean;
 }) => {
+  const [downloading, setDownloading] = useState(false);
+
   const downloaded = useRef<{
     file: Blob;
     extension: string;
   } | null>(null);
 
   const download = async () => {
+    setDownloading(true);
     const res = await fetch(url);
     const file = await res.blob();
 
     const match = mime.match(/\/(\w+)(?:\+|$)/);
     if (match === null) {
       alert("could not extract fileExtension from mimetype");
+      setDownloading(false);
       throw Error("could not extract fileExtension from mimetype");
     }
     const extension = match[1];
@@ -131,6 +136,8 @@ const Button = ({
       extension,
       file: blobFile,
     };
+
+    setDownloading(false);
 
     return { file, extension };
   };
@@ -193,7 +200,11 @@ const Button = ({
         className="group-hover:bg-zinc-100 !hover:bg-zinc-300 "
         title="in neuem Tab öffnen"
       >
-        <img src={OpenInNewIcon} alt="open in new tab" />
+        {downloading ? (
+          <Spinner className="h-3 w-3" />
+        ) : (
+          <img src={OpenInNewIcon} alt="open in new tab" />
+        )}
       </button>
     </div>
   );
