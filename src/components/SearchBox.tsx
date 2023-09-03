@@ -11,6 +11,7 @@ import useKeyboard from "../hooks/useKeybaord";
 import SearchIcon from "@assets/search.svg";
 import CloseIcon from "@assets/close.svg";
 import { Data, objectisEntrySign } from "../data";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 export default function SearchBox({
   data,
@@ -328,13 +329,14 @@ function ResultCategory({
   children: ReactNode[];
   name: string;
 }) {
+  const [parent] = useAutoAnimate();
   return (
     <div>
       <details open>
         <summary className="text-zinc-300 text-sm cursor-pointer">
           {name}
         </summary>
-        <div>{...children}</div>
+        <div ref={parent}>{...children}</div>
       </details>
     </div>
   );
