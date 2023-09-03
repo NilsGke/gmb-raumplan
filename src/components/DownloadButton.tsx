@@ -1,5 +1,5 @@
 import DownloadIcon from "@/assets/download.svg";
-import { ReactNode, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import Popup from "./Popup";
 import OpenInNewIcon from "@/assets/openInNew.svg";
 // downloadFiles
@@ -107,32 +107,63 @@ const Button = ({
   mime: string;
   highlighted?: boolean;
 }) => {
-  const download = () => {
-    fetch(url).then(async (res) => {
-      const file = await res.blob();
+  const downloaded = useRef<{
+    file: Blob;
+    extension: string;
+  } | null>(null);
 
-      const match = mime.match(/\/(\w+)(?:\?|$)/);
-      if (match === null)
-        return alert("could not extract fileExtension from mimetype");
-      const extension = match[1];
+  const download = async () => {
+    const res = await fetch(url);
+    const file = await res.blob();
 
-      const downloadURL = window.URL.createObjectURL(
-        new Blob([file], {
-          type: mime,
-        })
-      );
+    const match = mime.match(/\/(\w+)(?:\+|$)/);
+    if (match === null) {
+      alert("could not extract fileExtension from mimetype");
+      throw Error("could not extract fileExtension from mimetype");
+    }
+    const extension = match[1];
 
-      const element = document.createElement("a");
-      element.setAttribute("href", downloadURL);
-      element.setAttribute("download", `GMB-Raumplan.${extension}`);
-
-      element.style.display = "none";
-      document.body.appendChild(element);
-
-      element.click();
-
-      document.body.removeChild(element);
+    const blobFile = new Blob([file], {
+      type: mime,
     });
+
+    downloaded.current = {
+      extension,
+      file: blobFile,
+    };
+
+    return { file, extension };
+  };
+
+  const downloadToUsersMachine = ({
+    extension,
+    file,
+  }: Awaited<ReturnType<typeof download>>) => {
+    const downloadUrl = URL.createObjectURL(file);
+    const element = document.createElement("a");
+    element.setAttribute("href", downloadUrl);
+    element.setAttribute("download", `GMB-Raumplan.${extension}`);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  };
+
+  const openInNewTab = ({ file }: Awaited<ReturnType<typeof download>>) => {
+    const downloadUrl = URL.createObjectURL(file);
+    const element = document.createElement("a");
+    element.setAttribute("href", downloadUrl);
+    element.setAttribute("target", "_blank");
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
   };
 
   return (
@@ -144,21 +175,26 @@ const Button = ({
             ? " outline outline-1  outline-blue-600 border-blue-600"
             : ""
         )}
-        onClick={download}
+        onClick={() => {
+          if (downloaded.current === null)
+            download().then(downloadToUsersMachine);
+          else downloadToUsersMachine(downloaded.current);
+        }}
         title={highlighted ? "Empfohlene Auflösung" : undefined}
       >
         {children}
       </button>
 
-      <a
-        href={url}
-        onClick={(e) => e.stopPropagation()}
+      <button
+        onClick={() => {
+          if (downloaded.current === null) download().then(openInNewTab);
+          else openInNewTab(downloaded.current);
+        }}
         className="group-hover:bg-zinc-100 !hover:bg-zinc-300 "
-        target="_blank"
         title="in neuem Tab öffnen"
       >
         <img src={OpenInNewIcon} alt="open in new tab" />
-      </a>
+      </button>
     </div>
   );
 };
