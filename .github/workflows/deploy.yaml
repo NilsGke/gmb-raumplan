@@ -3,7 +3,7 @@ name: Deploy to FTP
 on:
   # Trigger the workflow when the other workflow completes successfully.
   workflow_run:
-    workflows: ["build-and-test"]
+    workflows: ["Build"]
     types: [completed]
 
 jobs:
