@@ -44,10 +44,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload zip to release
+      - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
-          name: website
+          name: build-artifacts
           path: dist/
 
       - name: Create Tag
