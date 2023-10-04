@@ -44,6 +44,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload zip to release
+        uses: actions/upload-artifact@v2
+        with:
+          name: website
+          path: dist/
+
       - name: Create Tag
         run: git tag -a v${{ steps.get_version.outputs.version }} -m "Version ${{ steps.get_version.outputs.version }}"
         if: success()
@@ -56,11 +62,7 @@ jobs:
         run: |
           zip -r dist.zip dist/*
 
-      - name: Upload zip to release
-        uses: actions/upload-artifact@v2
-        with:
-          name: website
-          path: dist.zip
+      
 
       - name: Create Release
         id: create_release
