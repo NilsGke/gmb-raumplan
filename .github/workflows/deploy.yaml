@@ -11,10 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v3
+
+      - uses: dawidd6/action-download-artifact@v2
         name: Download build code
         with:
           name: build-artifacts
+          workflow: Build
 
       - run: ls
 
