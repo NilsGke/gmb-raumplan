@@ -64,13 +64,14 @@ jobs:
 
 
       - name: Deploy to FTP
-        uses: SamKirkland/FTP-Deploy-Action@v3.1.1
+        uses: wlixcc/SFTP-Deploy-Action@1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          server-dir: test/
+          local-dir: ./dist/*
+          server-dir: /test/
           dry-run: true
 
 
