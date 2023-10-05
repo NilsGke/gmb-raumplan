@@ -64,7 +64,7 @@ jobs:
 
 
       - name: Deploy to FTP
-        uses: wlixcc/SFTP-Deploy-Action@1.2.4
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER }}
