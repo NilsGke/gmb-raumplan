@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "version.txt"
 
 jobs:
   build_and_deploy:
@@ -31,38 +29,6 @@ jobs:
       - name: Build Vite project
         run: npm run build
 
-      - name: Read version number
-        id: get_version
-        run: echo "::set-output name=version::$(cat version.txt)"
-
-      - name: Authenticate with GitHub Token
-        run: |
-          git config --global credential.helper store
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Bot Name"
-          git remote set-url origin "https://github.com/${{ github.repository }}.git"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-artifacts
-          path: dist/
-
-      - name: Create Tag
-        run: git tag -a v${{ steps.get_version.outputs.version }} -m "Version ${{ steps.get_version.outputs.version }}"
-        if: success()
-
-      - name: Push Tag
-        run: git push origin v${{ steps.get_version.outputs.version }}
-        if: success()
-
-      - name: Zip dist directory
-        run: |
-          zip -r dist.zip dist/*
-
-
       - name: Deploy to FTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
@@ -73,17 +39,3 @@ jobs:
           local_path: ./dist/*
           remote_path: /docroot/
           sftp_only: true
-
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist.zip
-          tag_name: v${{ steps.get_version.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.MACHINE_USER_PAT }}
-
-      - name: Get Release URL
-        run: |
-          echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
