@@ -71,7 +71,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           local_path: ./dist/*
-          remote_path: /test/
+          remote_path: /docroot/
           sftp_only: true
 
 
