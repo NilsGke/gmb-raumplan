@@ -70,9 +70,8 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          local-dir: ./dist/*
-          server-dir: /test/
-          dry-run: true
+          local_path: ./dist/*
+          remote_path: /test/
 
 
       - name: Create Release
