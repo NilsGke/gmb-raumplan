@@ -4,8 +4,8 @@
 
 Die Webseite für den Raumplan des Gymnasiums am Mosbacher Berg
 
-## Automationen
+## Automatisches Deployment
 
-Das Projekt wird automatisch auf die [Raumplan Webseite](https://raumplan.mosbacher-berg.de) deployed, wenn die [version.txt](./version.txt) geändert wird. Der Build bekommt automatisch die Version, die in `version.txt` und wird als Release herausgegeben.
+Der main Branch wird bei jedem Commit automatisch gebuildet und auf [raumplan.mosbacher-berg.de](https://raumplan.mosbacher-berg.de) hochgeladen.
 
 ![GMB-Raumpaln](./src/assets/files/GMB-Raumplan_Layer.svg)
