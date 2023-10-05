@@ -72,6 +72,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           local_path: ./dist/*
           remote_path: /test/
+          sftp_only: true
 
 
       - name: Create Release
