@@ -3,6 +3,7 @@ import {
   ReactNode,
   RefObject,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -10,9 +11,9 @@ import { twMerge } from "tailwind-merge";
 import useKeyboard from "../hooks/useKeybaord";
 import SearchIcon from "@assets/search.svg";
 import CloseIcon from "@assets/close.svg";
-import { Data, objectisEntrySign } from "../data";
+import { Data, objectIsBuilding, objectisEntrySign } from "../data";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-
+import containsAnySubstring from "../helpers/containsAnySubstring";
 export default function SearchBox({
   data,
   zoomToElement,
@@ -73,36 +74,78 @@ export default function SearchBox({
     if (expanded && inputRef.current !== null) inputRef.current.select();
   }, [expanded]);
 
-  const searchLower = searchString.toLowerCase();
+  const searchLower = searchString.toLowerCase().split(/-| |,|_/);
 
-  const rooms = data.rooms
-    .map((room) => ({
-      room,
-      number: parseFloat(room.number?.content || "0"),
-    }))
-    .sort((a, b) => (a.number === undefined ? 2 : a.number - b.number))
-    .map((room) => room.room)
-    .filter(
-      (room) =>
-        room.number?.content.toLowerCase().includes(searchLower) ||
-        room.extraTexts?.some((textElement) =>
-          textElement.content.toLowerCase().includes(searchLower),
-        ),
-    );
+  const sortedRooms = useMemo(
+    () =>
+      data.rooms
+        .map((room) => ({
+          room,
+          number: parseFloat(room.number?.content || "0"),
+        }))
+        .sort((a, b) => (a.number === undefined ? 2 : a.number - b.number))
+        .map((room) => room.room),
+    [data.rooms],
+  );
 
-  const entrySigns = data.entrySigns
-    .filter(
-      (entrySign) =>
-        entrySign.text?.content.toLowerCase().includes(searchLower),
-    )
-    .sort((a, b) =>
-      parseInt(a.text?.content.replace("E", "") || "0") <
-      parseInt(b.text?.content.replace("E", "") || "0")
-        ? -1
-        : 1,
-    );
+  const sortedBuildings = useMemo(
+    () =>
+      data.buildings.sort((a, b) => ((a.name || "") > (b.name || "") ? 1 : -1)),
+    [data.buildings],
+  );
 
-  const allResults = [...rooms, ...entrySigns];
+  const buildings =
+    searchString.length === 0
+      ? sortedBuildings
+      : sortedBuildings.filter((building) => {
+          if (building.name === null) return false;
+          const buildingNameLower = building.name.toLowerCase();
+          return searchLower.some(
+            (str) =>
+              buildingNameLower.includes(str) ||
+              building.letter?.toLocaleLowerCase().includes(str),
+          );
+        });
+
+  const rooms =
+    searchString.length === 0
+      ? sortedRooms
+      : sortedRooms.filter((room) => {
+          const roomStrings: string[] = [
+            room.number?.content.toLowerCase(),
+            ...(room.extraTexts?.map((t) => t.content.toLowerCase()) || []),
+            room.building.letter?.toLowerCase(),
+          ].filter((s) => s !== undefined) as string[];
+
+          if (containsAnySubstring(searchLower, roomStrings)) return true;
+
+          if (
+            room.building.name !== null &&
+            searchLower.includes(room.building.name?.toLowerCase())
+          )
+            return true;
+
+          return false;
+        });
+
+  const entrySigns =
+    searchString.length === 0
+      ? data.entrySigns
+      : data.entrySigns
+          .filter(
+            (entrySign) =>
+              (entrySign.text !== null &&
+                searchLower.includes(entrySign.text?.content.toLowerCase())) ||
+              searchLower.includes("e"),
+          )
+          .sort((a, b) =>
+            parseInt(a.text?.content.replace("E", "") || "0") <
+            parseInt(b.text?.content.replace("E", "") || "0")
+              ? -1
+              : 1,
+          );
+
+  const allResults = [...buildings, ...rooms, ...entrySigns];
 
   const highlightElement = (element: SVGElement) => {
     if (overlayRef.current === null) return;
@@ -183,6 +226,11 @@ export default function SearchBox({
             if (objectisEntrySign(resultElement)) {
               if (resultElement.rectElement !== null)
                 highlightElement(resultElement.rectElement);
+            } else if (objectIsBuilding(resultElement)) {
+              const element =
+                resultElement.outlineElement ||
+                resultElement.buildingGroupElement;
+              if (element) highlightElement(element);
             } else {
               const element =
                 resultElement.roomFloorElement ||
@@ -220,6 +268,31 @@ export default function SearchBox({
 
       <section className="scrollbar mt-4 h-[calc(100%-64px-10px)] w-full scroll-px-2 overflow-y-scroll p-2 ">
         <div>
+          {buildings.length > 0 && (
+            <ResultCategory name="Gebäude">
+              {buildings.map((building, index) => (
+                <ResultElement
+                  key={building.name || index}
+                  onClick={() => {
+                    const element =
+                      building.outlineElement || building.buildingGroupElement;
+
+                    highlightElement(element);
+                    zoomToElement(element as unknown as HTMLElement);
+                  }}
+                  style={{
+                    backgroundColor:
+                      building.rooms?.at(0)?.bgColor || undefined,
+                    color: building.rooms?.at(0)?.textColor || undefined,
+                  }}
+                  title={`Eingang-${building.name || "Ohne-Bezeichnung"}`}
+                >
+                  {building.name || building.letter || "unnamed Building"}
+                </ResultElement>
+              ))}
+            </ResultCategory>
+          )}
+
           {rooms.length > 0 && (
             <ResultCategory name="Räume">
               {rooms.map((room, index) => {
@@ -230,9 +303,9 @@ export default function SearchBox({
                 const name = extranames
                   ? extranames +
                     (room.number?.content ? ` (${room.number?.content})` : "")
-                  : room.number?.content ||
-                    room.extraTexts?.at(0)?.content ||
-                    "unnamed Room";
+                  : room.number?.content !== undefined
+                  ? room.building.letter + "-" + room.number?.content
+                  : room.extraTexts?.at(0)?.content || "unnamed Room";
 
                 return (
                   <ResultElement
