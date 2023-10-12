@@ -97,11 +97,15 @@ export default function SearchBox({
   const buildings =
     searchString.length === 0
       ? sortedBuildings
-      : sortedBuildings.filter(
-          (building) =>
-            building.name !== null &&
-            searchLower.includes(building.name.toLowerCase()),
-        );
+      : sortedBuildings.filter((building) => {
+          if (building.name === null) return false;
+          const buildingNameLower = building.name.toLowerCase();
+          return searchLower.some(
+            (str) =>
+              buildingNameLower.includes(str) ||
+              building.letter?.toLocaleLowerCase().includes(str),
+          );
+        });
 
   const rooms =
     searchString.length === 0
