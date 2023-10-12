@@ -1,11 +1,12 @@
 import flattenHTMLCollectionTree from "./helpers/flatenHTMLCollectionTree";
-import getInkscapeLabel from "./helpers/getInkscapeLabel";
+import { getBuildingLetter, getBuildingName } from "./helpers/getSvgLabels";
 
 const roomNumberRegex = /^([0-9]{3})(\.[0-9])?$/; // https://regexr.com/7hr5f
 const entryNumberRegex = /E[0-9]+/;
 
 export type Building = {
   name: string | null;
+  letter: string | null;
   buildingGroupElement: SVGGElement;
   outlineElement: SVGRectElement | SVGPathElement | null;
   rooms: Room[] | null;
@@ -33,6 +34,17 @@ export const objectisEntrySign = (obj: object): obj is EntrySign => {
     keys.includes("rectElement") &&
     keys.includes("bgColor") &&
     keys.includes("textColor")
+  );
+};
+
+export const objectIsBuilding = (obj: object): obj is Building => {
+  const keys = Object.keys(obj);
+  return (
+    keys.includes("name") &&
+    keys.includes("letter") &&
+    keys.includes("buildingGroupElement") &&
+    keys.includes("outlineElement") &&
+    keys.includes("rooms")
   );
 };
 
@@ -77,14 +89,22 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
     const building: Building = {
       buildingGroupElement: buildingGroupElement,
       name: null,
+      letter: null,
       outlineElement: null,
       rooms: null,
     };
 
-    building.name = getInkscapeLabel(buildingGroupElement);
+    building.name = getBuildingName(buildingGroupElement);
     if (building.name === null)
       console.error(
-        'Could not extract name from building! Please add inkscape:label="yourBuildingName" to element.',
+        "Could not extract name from building! Please add attribute: `building-name` to element.",
+        buildingGroupElement,
+      );
+
+    building.letter = getBuildingLetter(buildingGroupElement);
+    if (building.letter === null)
+      console.error(
+        "Could not extract name from building! Please add attribute: `building-letter` to element.",
         buildingGroupElement,
       );
 
@@ -111,7 +131,9 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
     else
       building.rooms = (
         Array.from(roomContainerElement.children).filter(
-          (elm) => elm.constructor.name === "SVGGElement",
+          (elm) =>
+            elm.constructor.name === "SVGGElement" &&
+            elm.classList.contains("room"),
         ) as SVGGElement[]
       ).map((roomGroup) => {
         const textElements = roomGroup.querySelectorAll<SVGTextElement>("text");
