@@ -46,10 +46,10 @@ export default function SearchBox({
         break;
 
       case "+":
-        zoomIn();
+        if (!expanded) zoomIn();
         break;
       case "-":
-        zoomOut();
+        if (!expanded) zoomOut();
         break;
       case "ArrowRight":
         if (!expanded) move("right");
