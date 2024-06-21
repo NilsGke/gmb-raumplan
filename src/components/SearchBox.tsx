@@ -52,16 +52,16 @@ export default function SearchBox({
         zoomOut();
         break;
       case "ArrowRight":
-        move("right");
+        if (!expanded) move("right");
         break;
       case "ArrowLeft":
-        move("left");
+        if (!expanded) move("left");
         break;
       case "ArrowUp":
-        move("up");
+        if (!expanded) move("up");
         break;
       case "ArrowDown":
-        move("down");
+        if (!expanded) move("down");
         break;
       default:
         break;
