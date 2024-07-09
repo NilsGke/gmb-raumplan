@@ -1,7 +1,8 @@
 import { ReactNode, useState } from "react";
 import QuestionMark from "@assets/questionMark.svg";
-import useKeyboard from "../hooks/useKeybaord";
+import useKeyboard, { usePressedKeys } from "../hooks/useKeybaord";
 import Popup from "./Popup";
+import { twMerge } from "tailwind-merge";
 
 export default function InfoButton() {
   const [popupOpen, setPopupOpen] = useState(false);
@@ -49,23 +50,26 @@ export default function InfoButton() {
           <div className="mb-2 flex flex-col gap-1 pl-4">
             <Row>
               Hilfe:
-              <Key>?</Key>
+              <Key triggerKey="?">?</Key>
             </Row>
             <Row>
               Heranzoomen:
-              <Key>+</Key>
+              <Key triggerKey="+">+</Key>
             </Row>
             <Row>
               Herauszoomen:
-              <Key>-</Key>
+              <Key triggerKey="-">-</Key>
             </Row>
             <Row>
               Bewegen:
-              <Key>Pfeiltasten</Key>
+              <Key triggerKey="ArrowLeft">←</Key>
+              <Key triggerKey="ArrowUp">↑</Key>
+              <Key triggerKey="ArrowRight">→</Key>
+              <Key triggerKey="ArrowDown">↓</Key>
             </Row>
             <Row>
               Suchen:
-              <Key>strg</Key> +<Key>f</Key>
+              <Key triggerKey="Control">strg</Key> +<Key triggerKey="f">f</Key>
             </Row>
           </div>
         </details>
@@ -83,20 +87,42 @@ const Item = ({ text, chip }: { text?: ReactNode; chip: ReactNode }) => (
 );
 
 const Chip = ({ children }: { children?: ReactNode }) => (
-  <div className="rounded-full bg-gray-200 px-2 py-0">{children}</div>
+  <div className="rounded-full bg-gray-200 px-2 py-0 transition hover:bg-gray-300">
+    {children}
+  </div>
 );
 
 const Row = ({ children }: { children: ReactNode }) => (
   <div className="felx justify-center gap-2">{children}</div>
 );
 
-const Key = ({ children: key }: { children: string }) => (
-  <button
-    onClick={() =>
-      document.dispatchEvent(new KeyboardEvent("keydown", { key }))
-    }
-    className="ml-2 inline-block w-min -translate-y-[2px] rounded-md border border-transparent bg-zinc-200 px-1 text-sm shadow-key active:translate-y-0  active:border-zinc-400 active:shadow-none"
-  >
-    {key}
-  </button>
-);
+const Key = ({
+  children,
+  triggerKey,
+}: {
+  children: ReactNode;
+  triggerKey: KeyboardEvent["key"];
+}) => {
+  const pressedKeys = usePressedKeys();
+
+  const mouseDownEvent = () =>
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
+  const mouseUpEvent = () =>
+    document.dispatchEvent(new KeyboardEvent("keyup", { key: triggerKey }));
+
+  return (
+    <button
+      onMouseDown={mouseDownEvent}
+      onMouseUp={mouseUpEvent}
+      onMouseLeave={mouseUpEvent}
+      className={twMerge(
+        "ml-2 inline-block -translate-y-[2px] rounded-md border border-transparent bg-zinc-200 px-1 text-sm shadow-key",
+        "active:translate-y-0  active:border-zinc-400 active:shadow-none",
+        pressedKeys.some((pressedKey) => triggerKey === pressedKey) &&
+          "translate-y-0 border-zinc-400 shadow-none",
+      )}
+    >
+      {children}
+    </button>
+  );
+};
