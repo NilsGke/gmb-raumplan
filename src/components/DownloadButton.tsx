@@ -3,21 +3,15 @@ import { ReactNode, useRef, useState } from "react";
 import Popup from "./Popup";
 import OpenInNewIcon from "@/assets/openInNew.svg";
 // downloadFiles
-// JPG
-import RaumplanJPG_x100 from "@/assets/files/GMB-Raumplan_Layer__x100.jpg";
-import RaumplanJPG_x250 from "@/assets/files/GMB-Raumplan_Layer__x250.jpg";
-import RaumplanJPG_x500 from "@/assets/files/GMB-Raumplan_Layer__x500.jpg";
-import RaumplanJPG_x750 from "@/assets/files/GMB-Raumplan_Layer__x750.jpg";
-import RaumplanJPG_x1000 from "@/assets/files/GMB-Raumplan_Layer__x1000.jpg";
 // PNG
-import RaumplanPNG_x100 from "@/assets/files/GMB-Raumplan_Layer__x100.png";
-import RaumplanPNG_x250 from "@/assets/files/GMB-Raumplan_Layer__x250.png";
-import RaumplanPNG_x500 from "@/assets/files/GMB-Raumplan_Layer__x500.png";
-import RaumplanPNG_x750 from "@/assets/files/GMB-Raumplan_Layer__x750.png";
-import RaumplanPNG_x1000 from "@/assets/files/GMB-Raumplan_Layer__x1000.png";
+import RaumplanPNG_x100 from "@/assets/map/GMB-Raumplan_x100.png";
+import RaumplanPNG_x250 from "@/assets/map/GMB-Raumplan_x250.png";
+import RaumplanPNG_x500 from "@/assets/map/GMB-Raumplan_x500.png";
+import RaumplanPNG_x750 from "@/assets/map/GMB-Raumplan_x750.png";
+import RaumplanPNG_x1000 from "@/assets/map/GMB-Raumplan_x1000.png";
 // Other
-import RaumplanSVG from "@/assets/files/GMB-Raumplan_Layer.svg";
-import RaumplanPDF from "@/assets/files/GMB-Raumplan_Layer.pdf";
+import RaumplanSVG from "@/assets/map/GMB-Raumplan.svg";
+import RaumplanPDF from "@/assets/map/GMB-Raumplan.pdf";
 import { twMerge } from "tailwind-merge";
 import Spinner from "./Spinner";
 
@@ -40,24 +34,6 @@ export default function DownloadButton() {
         title="Format Wählen"
       >
         <div className="flex gap-4">
-          <Col title="JPG">
-            <Button url={RaumplanJPG_x100} mime="image/jpg">
-              x100
-            </Button>
-            <Button url={RaumplanJPG_x250} mime="image/jpg">
-              x250
-            </Button>
-            <Button url={RaumplanJPG_x500} mime="image/jpg" highlighted>
-              x500
-            </Button>
-            <Button url={RaumplanJPG_x750} mime="image/jpg">
-              x750
-            </Button>
-            <Button url={RaumplanJPG_x1000} mime="image/jpg">
-              x1000
-            </Button>
-          </Col>
-
           <Col title={"PNG"}>
             <Button url={RaumplanPNG_x100} mime="image/png">
               x100

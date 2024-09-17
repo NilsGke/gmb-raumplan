@@ -6,7 +6,7 @@ import Spinner from "./components/Spinner";
 import zoomInIcon from "@assets/zoomIn.svg";
 import zoomOutIcon from "@assets/zoomOut.svg";
 import fullZoomOutIcon from "@assets/fullZoomOut.svg";
-import Map from "@assets/map.svg";
+import Map from "@assets/map/GMB-Raumplan.svg";
 import InfoButton from "./components/InfoButton";
 import DownloadButton from "./components/DownloadButton";
 
