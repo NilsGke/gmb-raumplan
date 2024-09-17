@@ -3968,9 +3968,9 @@
              transform="translate(-573.9349)"><tspan
                x="17799.154"
                y="13366.367"
-               id="tspan33"><tspan
+               id="tspan30"><tspan
                  dx="0 0 0 0 0 0 0 0 0 0 0 -0.0001373291"
-                 id="tspan8">Lehrerzimmer</tspan></tspan></text></g></g><g
+                 id="tspan3">Lehrerzimmer</tspan></tspan></text></g></g><g
          id="g59543"
          style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
          transform="translate(6.943785e-6,-1.3123719e-5)"
@@ -9402,7 +9402,7 @@
        id="path43442"
        style="display:inline;stroke-width:11.0767" /></g><g
      id="g1"
-     style="clip-rule:evenodd;display:none;opacity:0.34903;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"><path
+     style="clip-rule:evenodd;display:inline;opacity:0.34903;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"><path
        id="path31409-0-9"
        style="clip-rule:evenodd;display:inline;opacity:1;fill:#f0f0f0;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:19.4009;stroke-dasharray:none;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
        d="m 18891.249,12964.583 v 7223.125 h 978.958 v -1058.333 h 1084.791 v 767.291 h 820.209 v -6746.875 h -820.209 v 846.667 h -1084.791 v -1031.875 z m 2063.749,1719.792 V 16192.5 h -820.208 l -291.041,-1296.459 v -211.666 z m -820.208,2248.958 h 820.208 v 1508.125 h -1084.791 v -211.667 z"
