@@ -11,7 +11,6 @@ import InfoButton from "./components/InfoButton";
 import DownloadButton from "./components/DownloadButton";
 
 function App() {
-  console.log(Map);
   const overlayElementRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<Data | undefined>(undefined);

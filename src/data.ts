@@ -76,7 +76,6 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
 
   // load rooms
   const elements = flattenHTMLCollectionTree(svg.children);
-  console.log(elements);
 
   // remove images
   elements.forEach((elm) =>
@@ -215,8 +214,5 @@ export async function mapSetup(containerRef: React.RefObject<HTMLElement>) {
       };
     });
 
-  console.log(data);
-  // data.rooms.forEach((room) => (room.roomElement.style.opacity = "0.2"));
-  // console.log({ roomNumbers, entrySigns, stairSigns });
   return data;
 }
